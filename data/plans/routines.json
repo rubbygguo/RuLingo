@@ -1,0 +1,103 @@
+{
+  "sourcePath": "00-学习计划/每日英文提升计划.md",
+  "routines": [
+    {
+      "id": "routine-20min",
+      "name": "20 分钟保底版",
+      "mode": "20min",
+      "description": "忙、考试复习或状态不好时维持英文输出手感。",
+      "tasks": [
+        {
+          "type": "input",
+          "title": "输入",
+          "durationMinutes": 8,
+          "instruction": "读/听一小段考试相关材料，或复习一组错题。"
+        },
+        {
+          "type": "expression",
+          "title": "表达积累",
+          "durationMinutes": 5,
+          "targetCount": 2,
+          "instruction": "记录 2 个可直接用于考试或课堂的表达。"
+        },
+        {
+          "type": "output",
+          "title": "输出",
+          "durationMinutes": 5,
+          "instruction": "写 3-5 句英文，或录 30-60 秒口语。"
+        },
+        {
+          "type": "review",
+          "title": "复盘",
+          "durationMinutes": 2,
+          "instruction": "写下今天最容易错的 1 个点。"
+        }
+      ]
+    },
+    {
+      "id": "routine-45min",
+      "name": "45 分钟最低可执行版",
+      "mode": "45min",
+      "description": "忙、累、有课、有 deadline 的日子，只要完成这一版就算不断。",
+      "tasks": [
+        {
+          "type": "input",
+          "title": "输入",
+          "durationMinutes": 15,
+          "instruction": "选课程 reading、英文新闻、音视频片段、lecture notes 或 assignment brief，抓主旨并写 1 句英文总结。"
+        },
+        {
+          "type": "expression",
+          "title": "表达积累",
+          "durationMinutes": 10,
+          "targetCount": 3,
+          "instruction": "优先积累 phrase / collocation / sentence pattern。"
+        },
+        {
+          "type": "output",
+          "title": "输出",
+          "durationMinutes": 15,
+          "instruction": "录音 1 分钟、写 100-150 词 mini response、复述课堂观点，或写一封短邮件/消息。"
+        },
+        {
+          "type": "review",
+          "title": "复盘",
+          "durationMinutes": 5,
+          "instruction": "记录今天输入、最有用的表达、卡住的地方。"
+        }
+      ]
+    },
+    {
+      "id": "routine-90min",
+      "name": "75-90 分钟标准提升版",
+      "mode": "90min",
+      "description": "状态正常、想稳定进步的日子使用。",
+      "tasks": [
+        {
+          "type": "input",
+          "title": "精读或精听",
+          "durationMinutes": 25,
+          "instruction": "第一遍抓结构，第二遍标逻辑连接、观点表达和动词搭配，摘 5 个表达。"
+        },
+        {
+          "type": "speaking",
+          "title": "口语输出",
+          "durationMinutes": 20,
+          "instruction": "练 1 分钟总结、2 分钟同意/不同意、seminar 发言或 presentation opening。"
+        },
+        {
+          "type": "writing",
+          "title": "写作输出",
+          "durationMinutes": 25,
+          "instruction": "写 120-250 词，并按 correctness、naturalness、sophistication 三层修改。"
+        },
+        {
+          "type": "review",
+          "title": "主动复盘",
+          "durationMinutes": 10,
+          "instruction": "记录能直接用的表达、反复犯的问题、明天刻意练习点。"
+        }
+      ]
+    }
+  ]
+}

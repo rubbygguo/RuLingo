@@ -1,0 +1,50 @@
+{
+  "materialTypes": [
+    "reading",
+    "listening",
+    "lecture",
+    "seminar",
+    "exam",
+    "assignment"
+  ],
+  "practiceTypes": [
+    "speaking",
+    "writing",
+    "course",
+    "presentation",
+    "review"
+  ],
+  "scenes": [
+    "postgraduate study",
+    "time management",
+    "seminar",
+    "academic discussion",
+    "academic writing",
+    "presentation",
+    "email",
+    "daily communication"
+  ],
+  "tags": [
+    "IELTS 6.5",
+    "20min",
+    "45min",
+    "90min",
+    "reading",
+    "speaking",
+    "writing",
+    "review",
+    "sentence frames",
+    "hedging",
+    "critical reading",
+    "participation",
+    "confidence",
+    "postgraduate life"
+  ],
+  "statuses": [
+    "new",
+    "learning",
+    "active",
+    "review",
+    "mastered"
+  ]
+}

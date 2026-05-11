@@ -1,0 +1,49 @@
+{
+  "sourcePath": "00-学习计划/每日英文提升计划.md",
+  "milestones": [
+    {
+      "week": 1,
+      "title": "建立节奏",
+      "goal": "目标不是猛学，而是不断。",
+      "targets": [
+        "每天至少完成对应版本。",
+        "建立表达积累文件。",
+        "至少录音 3 次。",
+        "至少写 3 篇 100-200 词短文。"
+      ]
+    },
+    {
+      "week": 2,
+      "title": "提升课堂讨论能力",
+      "goal": "每次 seminar 前准备 3 句可用表达。",
+      "targets": [
+        "how to agree/disagree",
+        "how to ask clarification questions",
+        "how to build on someone else's point",
+        "how to summarize an argument"
+      ]
+    },
+    {
+      "week": 3,
+      "title": "提升学术写作",
+      "goal": "每天写一个 paragraph，发给我精修。",
+      "targets": [
+        "topic sentence",
+        "evidence + explanation",
+        "hedging language",
+        "logical transitions"
+      ]
+    },
+    {
+      "week": 4,
+      "title": "整合输出",
+      "goal": "能更自然地把输入变成自己的表达。",
+      "targets": [
+        "做一次 3-5 分钟 presentation。",
+        "写一篇 500-800 词短文。",
+        "整理一个个人高频表达库。",
+        "做一次月度复盘。"
+      ]
+    }
+  ]
+}

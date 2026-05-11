@@ -1,0 +1,235 @@
+{
+  "category": "学术和课堂讨论",
+  "sourcePath": "02-表达积累/表达库_起步版.md",
+  "expressions": [
+    {
+      "id": "expr-the-author-seems-to-argue-that",
+      "text": "The author seems to argue that...",
+      "meaning": "作者似乎认为……",
+      "example": "The author seems to argue that seminar participation is a regular habit rather than a test of intelligence.",
+      "mySentence": "",
+      "scenes": [
+        "seminar",
+        "academic discussion",
+        "academic writing"
+      ],
+      "tags": [
+        "summary",
+        "sentence frames"
+      ],
+      "sourceMaterialId": "material-2026-05-07-seminar-speaking",
+      "status": "new"
+    },
+    {
+      "id": "expr-to-some-extent",
+      "text": "I agree with this point to some extent because...",
+      "meaning": "我在某种程度上同意，因为……",
+      "example": "I agree with this point to some extent because students need both confidence and preparation.",
+      "mySentence": "",
+      "scenes": [
+        "seminar",
+        "academic discussion"
+      ],
+      "tags": [
+        "agreement",
+        "hedging"
+      ],
+      "sourceMaterialId": "material-2026-05-07-seminar-speaking",
+      "status": "new"
+    },
+    {
+      "id": "expr-a-possible-limitation-is",
+      "text": "A possible limitation is...",
+      "meaning": "一个可能的局限是……",
+      "example": "A possible limitation is that this strategy may not work in very fast discussions.",
+      "mySentence": "",
+      "scenes": [
+        "academic discussion",
+        "academic writing"
+      ],
+      "tags": [
+        "critique",
+        "hedging"
+      ],
+      "sourceMaterialId": "",
+      "status": "new"
+    },
+    {
+      "id": "expr-could-we-also-consider-this-from-the-perspective-of",
+      "text": "Could we also consider this from the perspective of...?",
+      "meaning": "我们是否也可以从……角度考虑？",
+      "example": "Could we also consider this from the perspective of international students?",
+      "mySentence": "",
+      "scenes": [
+        "seminar",
+        "academic discussion"
+      ],
+      "tags": [
+        "question",
+        "perspective"
+      ],
+      "sourceMaterialId": "material-2026-05-07-seminar-speaking",
+      "status": "new"
+    },
+    {
+      "id": "expr-building-on-what-you-just-said",
+      "text": "Building on what you just said...",
+      "meaning": "接着你刚才说的……",
+      "example": "Building on what you just said, I think language confidence also matters.",
+      "mySentence": "",
+      "scenes": [
+        "seminar",
+        "academic discussion"
+      ],
+      "tags": [
+        "participation",
+        "response"
+      ],
+      "sourceMaterialId": "material-2026-05-07-seminar-speaking",
+      "status": "new"
+    },
+    {
+      "id": "expr-that-relates-to-the-issue-of",
+      "text": "That relates to the issue of...",
+      "meaning": "这与……问题有关",
+      "example": "That relates to the issue of language confidence.",
+      "mySentence": "",
+      "scenes": [
+        "seminar",
+        "academic discussion"
+      ],
+      "tags": [
+        "connection",
+        "response"
+      ],
+      "sourceMaterialId": "material-2026-05-07-seminar-speaking",
+      "status": "new"
+    },
+    {
+      "id": "expr-find-it-difficult-to",
+      "text": "find it difficult to...",
+      "meaning": "觉得做某事困难",
+      "example": "I find it difficult to speak when the discussion moves quickly.",
+      "mySentence": "",
+      "scenes": [
+        "seminar",
+        "academic discussion"
+      ],
+      "tags": [
+        "difficulty",
+        "speaking"
+      ],
+      "sourceMaterialId": "material-2026-05-07-seminar-speaking",
+      "status": "new"
+    },
+    {
+      "id": "expr-make-a-valuable-contribution",
+      "text": "make a valuable contribution",
+      "meaning": "做出有价值的贡献",
+      "example": "Even a short question can make a valuable contribution.",
+      "mySentence": "",
+      "scenes": [
+        "seminar",
+        "academic discussion"
+      ],
+      "tags": [
+        "participation",
+        "confidence"
+      ],
+      "sourceMaterialId": "material-2026-05-07-seminar-speaking",
+      "status": "new"
+    },
+    {
+      "id": "expr-from-the-perspective-of",
+      "text": "from the perspective of...",
+      "meaning": "从……角度看",
+      "example": "Could we consider this from the perspective of international students?",
+      "mySentence": "",
+      "scenes": [
+        "seminar",
+        "academic discussion"
+      ],
+      "tags": [
+        "perspective",
+        "question"
+      ],
+      "sourceMaterialId": "material-2026-05-07-seminar-speaking",
+      "status": "new"
+    },
+    {
+      "id": "expr-build-on-other-peoples-comments",
+      "text": "build on other people's comments",
+      "meaning": "接着别人的观点说",
+      "example": "I can build on other people's comments instead of starting from zero.",
+      "mySentence": "",
+      "scenes": [
+        "seminar",
+        "academic discussion"
+      ],
+      "tags": [
+        "participation",
+        "response"
+      ],
+      "sourceMaterialId": "material-2026-05-07-seminar-speaking",
+      "status": "new"
+    },
+    {
+      "id": "expr-that-relates-to",
+      "text": "That relates to...",
+      "meaning": "这与……有关",
+      "example": "That relates to the issue of language confidence.",
+      "mySentence": "",
+      "scenes": [
+        "seminar",
+        "academic discussion"
+      ],
+      "tags": [
+        "connection",
+        "response"
+      ],
+      "sourceMaterialId": "material-2026-05-07-seminar-speaking",
+      "status": "new"
+    },
+    {
+      "id": "expr-rather-than-a-test-of-intelligence",
+      "text": "rather than a test of intelligence",
+      "meaning": "而不是智力测试",
+      "example": "Seminar discussion is a habit rather than a test of intelligence.",
+      "mySentence": "",
+      "scenes": [
+        "seminar",
+        "academic discussion"
+      ],
+      "tags": [
+        "contrast",
+        "confidence"
+      ],
+      "sourceMaterialId": "material-2026-05-07-seminar-speaking",
+      "status": "new"
+    },
+    {
+      "id": "expr-thinking-in-english",
+      "text": "thinking in English",
+      "meaning": "用英文思考",
+      "example": "I want to practise thinking in English more often.",
+      "mySentence": "",
+      "scenes": [
+        "seminar",
+        "academic discussion"
+      ],
+      "tags": [
+        "mindset",
+        "speaking"
+      ],
+      "sourceMaterialId": "material-2026-05-07-seminar-speaking",
+      "status": "new"
+    }
+  ],
+  "templates": [
+    "My understanding is that...",
+    "One thing I found interesting is...",
+    "I partly agree with this because...",
+    "I am not fully convinced by...",
+    "This reminds me of..."
+  ]
+}

@@ -1,0 +1,222 @@
+{
+  "sourcePaths": [
+    "04-口语练习/口语题库_起步版.md",
+    "01-素材库/2026-05-06_20分钟练习_研究生时间管理.md",
+    "01-素材库/2026-05-07_20分钟练习_Seminar发言.md"
+  ],
+  "practices": [
+    {
+      "id": "practice-study-time-management",
+      "type": "speaking",
+      "duration": "30-60 seconds",
+      "title": "Study time as a postgraduate student",
+      "prompt": "How do you usually manage your study time as a postgraduate student?",
+      "frames": [
+        "As a postgraduate student, I find it challenging to...",
+        "One strategy that works for me is...",
+        "However, I still need to improve..."
+      ],
+      "relatedMaterialIds": [
+        "material-2026-05-06-time-management"
+      ],
+      "tags": [
+        "postgraduate life",
+        "time management"
+      ]
+    },
+    {
+      "id": "practice-seminar-participation-difficulty",
+      "type": "speaking",
+      "duration": "30-60 seconds",
+      "title": "Seminar participation difficulty",
+      "prompt": "Why can seminar participation be difficult for international students?",
+      "frames": [
+        "I think one reason is that...",
+        "Another factor is...",
+        "One possible solution is..."
+      ],
+      "relatedMaterialIds": [
+        "material-2026-05-07-seminar-speaking"
+      ],
+      "tags": [
+        "seminar",
+        "academic discussion",
+        "confidence"
+      ]
+    },
+    {
+      "id": "practice-academic-skill-this-month",
+      "type": "speaking",
+      "duration": "30-60 seconds",
+      "title": "Academic skill this month",
+      "prompt": "What is one academic skill you want to improve this month?",
+      "frames": [
+        "My first point is that...",
+        "For example...",
+        "That is why I think..."
+      ],
+      "relatedMaterialIds": [],
+      "tags": [
+        "academic skills",
+        "reflection"
+      ]
+    },
+    {
+      "id": "practice-study-alone-or-with-classmates",
+      "type": "speaking",
+      "duration": "30-60 seconds",
+      "title": "Studying alone or with classmates",
+      "prompt": "Do you prefer studying alone or with classmates? Why?",
+      "frames": [
+        "My first point is that...",
+        "Another thing worth mentioning is...",
+        "For example..."
+      ],
+      "relatedMaterialIds": [],
+      "tags": [
+        "daily communication",
+        "postgraduate life"
+      ]
+    },
+    {
+      "id": "practice-difficult-reading",
+      "type": "speaking",
+      "duration": "30-60 seconds",
+      "title": "Difficult reading",
+      "prompt": "What makes a reading difficult for you?",
+      "frames": [
+        "My understanding is that...",
+        "One thing I found difficult is...",
+        "A possible solution is..."
+      ],
+      "relatedMaterialIds": [],
+      "tags": [
+        "reading",
+        "critical reading"
+      ]
+    },
+    {
+      "id": "practice-presentation-preparation",
+      "type": "speaking",
+      "duration": "30-60 seconds",
+      "title": "Presentation preparation",
+      "prompt": "How do you usually prepare for a presentation?",
+      "frames": [
+        "My first point is that...",
+        "Another thing worth mentioning is...",
+        "That is why I think..."
+      ],
+      "relatedMaterialIds": [],
+      "tags": [
+        "presentation",
+        "speaking"
+      ]
+    },
+    {
+      "id": "practice-studying-in-hong-kong",
+      "type": "speaking",
+      "duration": "30-60 seconds",
+      "title": "Studying in Hong Kong",
+      "prompt": "What is one challenge of studying in Hong Kong?",
+      "frames": [
+        "One challenge is that...",
+        "For example...",
+        "However, I can improve this by..."
+      ],
+      "relatedMaterialIds": [],
+      "tags": [
+        "postgraduate life",
+        "daily communication"
+      ]
+    },
+    {
+      "id": "practice-exam-pressure",
+      "type": "speaking",
+      "duration": "30-60 seconds",
+      "title": "Exam pressure",
+      "prompt": "How do you deal with pressure before an exam?",
+      "frames": [
+        "One strategy that works for me is...",
+        "However, I still need to improve...",
+        "That is why I think..."
+      ],
+      "relatedMaterialIds": [],
+      "tags": [
+        "exam",
+        "pressure"
+      ]
+    },
+    {
+      "id": "practice-course-that-changed-thinking",
+      "type": "speaking",
+      "duration": "2 minutes",
+      "title": "A course that changed the way you think",
+      "prompt": "Describe a course that has changed the way you think.",
+      "frames": [
+        "My first point is that...",
+        "Another thing worth mentioning is...",
+        "For example...",
+        "That is why I think..."
+      ],
+      "relatedMaterialIds": [],
+      "tags": [
+        "course",
+        "reflection"
+      ]
+    },
+    {
+      "id": "practice-group-work",
+      "type": "speaking",
+      "duration": "2 minutes",
+      "title": "A time when you worked in a group",
+      "prompt": "Talk about a time when you had to work in a group.",
+      "frames": [
+        "My first point is that...",
+        "Another thing worth mentioning is...",
+        "For example...",
+        "That is why I think..."
+      ],
+      "relatedMaterialIds": [],
+      "tags": [
+        "group work",
+        "postgraduate life"
+      ]
+    },
+    {
+      "id": "practice-english-learning-habit",
+      "type": "speaking",
+      "duration": "2 minutes",
+      "title": "A habit that helps English learning",
+      "prompt": "Explain one habit that helps you learn English.",
+      "frames": [
+        "My first point is that...",
+        "Another thing worth mentioning is...",
+        "For example...",
+        "That is why I think..."
+      ],
+      "relatedMaterialIds": [],
+      "tags": [
+        "habit",
+        "English learning"
+      ]
+    },
+    {
+      "id": "practice-theory-or-practical-skills",
+      "type": "speaking",
+      "duration": "2 minutes",
+      "title": "Theory or practical skills",
+      "prompt": "Discuss whether postgraduate students should focus more on theory or practical skills.",
+      "frames": [
+        "My first point is that...",
+        "Another thing worth mentioning is...",
+        "For example...",
+        "That is why I think..."
+      ],
+      "relatedMaterialIds": [],
+      "tags": [
+        "argument",
+        "postgraduate study"
+      ]
+    }
+  ]
+}

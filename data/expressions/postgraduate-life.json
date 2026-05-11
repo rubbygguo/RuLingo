@@ -1,0 +1,151 @@
+{
+  "category": "研究生学习生活",
+  "sourcePath": "02-表达积累/表达库_起步版.md",
+  "expressions": [
+    {
+      "id": "expr-manage-the-amount-of-independent-work",
+      "text": "manage the amount of independent work",
+      "meaning": "管理大量自主学习任务",
+      "example": "Postgraduate students need to manage the amount of independent work outside the classroom.",
+      "mySentence": "",
+      "scenes": [
+        "postgraduate study",
+        "time management"
+      ],
+      "tags": [
+        "postgraduate life",
+        "study skills"
+      ],
+      "sourceMaterialId": "material-2026-05-06-time-management",
+      "status": "new"
+    },
+    {
+      "id": "expr-one-of-the-biggest-challenges-is-not-but",
+      "text": "one of the biggest challenges is not..., but...",
+      "meaning": "最大挑战不是……而是……",
+      "example": "One of the biggest challenges is not reading in English, but expressing my own view clearly.",
+      "mySentence": "",
+      "scenes": [
+        "postgraduate study",
+        "academic discussion"
+      ],
+      "tags": [
+        "contrast",
+        "sentence frames"
+      ],
+      "sourceMaterialId": "material-2026-05-06-time-management",
+      "status": "new"
+    },
+    {
+      "id": "expr-outside-the-classroom",
+      "text": "outside the classroom",
+      "meaning": "课堂之外",
+      "example": "A lot of postgraduate learning happens outside the classroom.",
+      "mySentence": "",
+      "scenes": [
+        "postgraduate study"
+      ],
+      "tags": [
+        "study context"
+      ],
+      "sourceMaterialId": "material-2026-05-06-time-management",
+      "status": "new"
+    },
+    {
+      "id": "expr-read-more-critically",
+      "text": "read more critically",
+      "meaning": "更批判性地阅读",
+      "example": "I need to read more critically instead of simply highlighting everything.",
+      "mySentence": "",
+      "scenes": [
+        "postgraduate study",
+        "academic writing"
+      ],
+      "tags": [
+        "critical reading"
+      ],
+      "sourceMaterialId": "material-2026-05-06-time-management",
+      "status": "new"
+    },
+    {
+      "id": "expr-make-deliberate-choices",
+      "text": "make deliberate choices",
+      "meaning": "有意识地做选择",
+      "example": "Good time management means making deliberate choices.",
+      "mySentence": "",
+      "scenes": [
+        "postgraduate study",
+        "time management"
+      ],
+      "tags": [
+        "study skills"
+      ],
+      "sourceMaterialId": "material-2026-05-06-time-management",
+      "status": "new"
+    },
+    {
+      "id": "expr-leave-room-for-uncertainty",
+      "text": "leave room for uncertainty",
+      "meaning": "给不确定性留空间",
+      "example": "My weekly plan should leave room for uncertainty.",
+      "mySentence": "",
+      "scenes": [
+        "postgraduate study",
+        "time management"
+      ],
+      "tags": [
+        "planning"
+      ],
+      "sourceMaterialId": "material-2026-05-06-time-management",
+      "status": "new"
+    },
+    {
+      "id": "expr-become-overwhelmed",
+      "text": "become overwhelmed",
+      "meaning": "感到不堪重负",
+      "example": "I become overwhelmed when several deadlines come at the same time.",
+      "mySentence": "",
+      "scenes": [
+        "postgraduate study",
+        "time management"
+      ],
+      "tags": [
+        "pressure"
+      ],
+      "sourceMaterialId": "material-2026-05-06-time-management",
+      "status": "new"
+    },
+    {
+      "id": "expr-directly-linked-to",
+      "text": "directly linked to...",
+      "meaning": "与……直接相关",
+      "example": "This reading is directly linked to tomorrow's seminar.",
+      "mySentence": "",
+      "scenes": [
+        "postgraduate study",
+        "academic discussion"
+      ],
+      "tags": [
+        "connection"
+      ],
+      "sourceMaterialId": "material-2026-05-06-time-management",
+      "status": "new"
+    },
+    {
+      "id": "expr-have-a-cumulative-effect",
+      "text": "have a cumulative effect",
+      "meaning": "产生累积效果",
+      "example": "Daily speaking practice can have a cumulative effect.",
+      "mySentence": "",
+      "scenes": [
+        "postgraduate study"
+      ],
+      "tags": [
+        "progress",
+        "habit"
+      ],
+      "sourceMaterialId": "material-2026-05-06-time-management",
+      "status": "new"
+    }
+  ]
+}

@@ -1,0 +1,56 @@
+{
+  "id": "plan-2026-05-11",
+  "date": "2026-05-11",
+  "focus": "按听、说、读、写四类完成当天英语学习打卡",
+  "categories": [
+    {
+      "id": "listening",
+      "title": "听",
+      "description": "听力输入、精听、泛听、课堂或材料音频。",
+      "tasks": [
+        {
+          "id": "listen-20min",
+          "title": "听力练习 20 分钟",
+          "note": "具体材料可以之后再补充或替换。"
+        }
+      ]
+    },
+    {
+      "id": "speaking",
+      "title": "说",
+      "description": "口语输出、复述、seminar 发言和日常表达训练。",
+      "tasks": [
+        {
+          "id": "speak-20min",
+          "title": "口语练习 20 分钟",
+          "note": "可以是录音、复述、问答或 seminar 表达准备。"
+        }
+      ]
+    },
+    {
+      "id": "reading",
+      "title": "读",
+      "description": "阅读文章、课程材料、新闻或研究相关内容。",
+      "tasks": [
+        {
+          "id": "read-two-articles",
+          "title": "阅读两篇文章",
+          "note": "阅读后积累关键表达。"
+        }
+      ]
+    },
+    {
+      "id": "writing",
+      "title": "写",
+      "description": "短文、mini response、课程写作和表达改写。",
+      "tasks": [
+        {
+          "id": "write-short-piece",
+          "title": "写一篇短文",
+          "note": "篇幅和主题之后可以按当天情况调整。"
+        }
+      ]
+    }
+  ],
+  "status": "planned"
+}
