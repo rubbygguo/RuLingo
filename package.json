@@ -9,6 +9,7 @@
     "preview": "PORT=4173 max preview"
   },
   "dependencies": {
+    "@cloudbase/js-sdk": "^2.28.5",
     "@mantine/core": "^9.1.1",
     "@mantine/hooks": "^9.1.1",
     "@umijs/max": "^4.6.52",

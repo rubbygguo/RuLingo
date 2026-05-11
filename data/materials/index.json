@@ -1,5 +1,5 @@
 {
-  "sourcePath": "01-素材库",
+  "sourcePath": "legacy-local-materials",
   "materials": [
     {
       "id": "material-2026-05-06-time-management",
@@ -17,7 +17,7 @@
         "critical reading",
         "postgraduate life"
       ],
-      "sourcePath": "01-素材库/2026-05-06_20分钟练习_研究生时间管理.md",
+      "sourcePath": null,
       "contentFile": "readings/2026-05-06-time-management.md",
       "expressionIds": [
         "expr-one-of-the-biggest-challenges-is-not-but",
@@ -52,7 +52,7 @@
         "confidence",
         "sentence frames"
       ],
-      "sourcePath": "01-素材库/2026-05-07_20分钟练习_Seminar发言.md",
+      "sourcePath": null,
       "contentFile": "readings/2026-05-07-seminar-speaking.md",
       "expressionIds": [
         "expr-find-it-difficult-to",

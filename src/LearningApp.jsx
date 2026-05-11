@@ -12,6 +12,13 @@ import {
   Title
 } from "@mantine/core";
 import { loadLearningData } from "./dataClient.js";
+import {
+  getProgressStoreName,
+  loadDayCompletions,
+  loadRangeCompletions,
+  saveTaskCompletion,
+  signOutProgressUser
+} from "./progressStore.js";
 
 const emptyData = {
   settings: null,
@@ -34,7 +41,7 @@ export default function LearningApp() {
   const [query, setQuery] = useState("");
   const [selectedTag, setSelectedTag] = useState("all");
   const [selectedPracticeDuration, setSelectedPracticeDuration] = useState("all");
-  const [activeSection, setActiveSection] = useState("today");
+  const [activeSection, setActiveSection] = useState("materials");
 
   useEffect(() => {
     let ignore = false;
@@ -97,7 +104,6 @@ export default function LearningApp() {
 
         {status !== "error" && (
           <>
-            <TodayWorkbench data={data} />
             <MaterialsSection
               materials={filteredMaterials}
               expressions={data.expressions}
@@ -124,14 +130,60 @@ export default function LearningApp() {
   );
 }
 
+export function TodayPlanPage() {
+  const [data, setData] = useState(emptyData);
+  const [status, setStatus] = useState("loading");
+
+  useEffect(() => {
+    let ignore = false;
+
+    loadLearningData()
+      .then((result) => {
+        if (ignore) return;
+        setData(result);
+        setStatus("ready");
+      })
+      .catch((error) => {
+        console.error(error);
+        if (!ignore) setStatus("error");
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  return (
+    <div className="app-shell">
+      <Sidebar
+        query=""
+        setQuery={() => {}}
+        activeSection="today"
+        setActiveSection={() => {}}
+        statusText={getStatusText(status, data)}
+      />
+
+      <main>
+        {status === "error" && (
+          <div className="empty-state">
+            数据读取失败。请运行开发服务器后访问 <strong>http://localhost:4173/site/today</strong>。
+          </div>
+        )}
+
+        {status !== "error" && <TodayWorkbench data={data} />}
+      </main>
+    </div>
+  );
+}
+
 function Sidebar({ query, setQuery, activeSection, setActiveSection, statusText }) {
   const navItems = [
-    ["today", "今日工作台"],
-    ["materials", "素材库"],
-    ["expressions", "表达库"],
-    ["practices", "练习库"],
-    ["writing", "写作"],
-    ["review", "复盘"]
+    ["today", "今日计划", `${getBasePath()}today`],
+    ["materials", "素材库", `${getBasePath()}#materials`],
+    ["expressions", "表达库", `${getBasePath()}#expressions`],
+    ["practices", "练习库", `${getBasePath()}#practices`],
+    ["writing", "写作", `${getBasePath()}#writing`],
+    ["review", "复盘", `${getBasePath()}#review`]
   ];
 
   return (
@@ -152,10 +204,10 @@ function Sidebar({ query, setQuery, activeSection, setActiveSection, statusText 
       </label>
 
       <nav className="nav" aria-label="主导航">
-        {navItems.map(([id, label]) => (
+        {navItems.map(([id, label, href]) => (
           <a
             key={id}
-            href={`#${id}`}
+            href={href}
             className={activeSection === id ? "active" : ""}
             onClick={() => setActiveSection(id)}
           >
@@ -165,25 +217,80 @@ function Sidebar({ query, setQuery, activeSection, setActiveSection, statusText 
       </nav>
 
       <div className="sidebar-note">{statusText}</div>
+      <button
+        type="button"
+        className="sidebar-logout"
+        onClick={async () => {
+          await signOutProgressUser();
+          window.location.replace(`${getBasePath()}login`);
+        }}
+      >
+        退出登录
+      </button>
     </aside>
   );
 }
 
-function TodayWorkbench({ data }) {
+export function TodayWorkbench({ data }) {
   const { dailyPlan } = data;
   const todayKey = getTodayDateKey();
-  const completionKey = dailyPlan ? `daily-plan-completions:${todayKey}` : "";
+  const [selectedDate, setSelectedDate] = useState(todayKey);
+  const [rangeStart, setRangeStart] = useState(() => getStartOfWeekKey(todayKey));
+  const [rangeEnd, setRangeEnd] = useState(() => getEndOfWeekKey(todayKey));
   const [completedTasks, setCompletedTasks] = useState({});
+  const [rangeRecords, setRangeRecords] = useState([]);
+  const [progressError, setProgressError] = useState("");
+  const categories = dailyPlan?.categories || [];
+  const taskCount = categories.reduce((sum, category) => sum + (category.tasks?.length || 0), 0);
+  const completedCount = categories.reduce(
+    (sum, category) =>
+      sum + (category.tasks || []).filter((task) => completedTasks[getTaskKey(category.id, task.id)]).length,
+    0
+  );
+  const stats = useMemo(
+    () => buildRangeStats(categories, rangeStart, rangeEnd, rangeRecords),
+    [categories, rangeStart, rangeEnd, rangeRecords]
+  );
 
   useEffect(() => {
-    if (!completionKey) return;
-    const saved = window.localStorage.getItem(completionKey);
-    try {
-      setCompletedTasks(saved ? JSON.parse(saved) : {});
-    } catch {
-      setCompletedTasks({});
-    }
-  }, [completionKey]);
+    if (!dailyPlan) return;
+    let ignore = false;
+
+    loadDayCompletions(selectedDate)
+      .then((tasks) => {
+        if (ignore) return;
+        setCompletedTasks(tasks);
+        setProgressError("");
+      })
+      .catch((error) => {
+        console.error(error);
+        if (!ignore) setProgressError(error.message || "完成记录读取失败");
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [dailyPlan, selectedDate]);
+
+  useEffect(() => {
+    if (!dailyPlan) return;
+    let ignore = false;
+
+    loadRangeCompletions(rangeStart, rangeEnd)
+      .then((records) => {
+        if (ignore) return;
+        setRangeRecords(records);
+        setProgressError("");
+      })
+      .catch((error) => {
+        console.error(error);
+        if (!ignore) setProgressError(error.message || "统计记录读取失败");
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [dailyPlan, rangeStart, rangeEnd, completedTasks]);
 
   if (!dailyPlan) {
     return (
@@ -193,32 +300,76 @@ function TodayWorkbench({ data }) {
     );
   }
 
-  const categories = dailyPlan.categories || [];
-  const taskCount = categories.reduce((sum, category) => sum + (category.tasks?.length || 0), 0);
-  const completedCount = categories.reduce(
-    (sum, category) =>
-      sum + (category.tasks || []).filter((task) => completedTasks[getTaskKey(category.id, task.id)]).length,
-    0
-  );
-
   function toggleTask(categoryId, taskId) {
     const taskKey = getTaskKey(categoryId, taskId);
     setCompletedTasks((current) => {
       const next = { ...current, [taskKey]: !current[taskKey] };
-      window.localStorage.setItem(completionKey, JSON.stringify(next));
+      saveTaskCompletion({
+        dateKey: selectedDate,
+        categoryId,
+        taskId,
+        completed: next[taskKey]
+      }).catch((error) => {
+        console.error(error);
+        setProgressError(error.message || "完成记录保存失败");
+      });
       return next;
     });
+  }
+
+  function moveSelectedDate(offset) {
+    setSelectedDate((current) => addDaysKey(current, offset));
+  }
+
+  function applyRangePreset(preset) {
+    if (preset === "week") {
+      setRangeStart(getStartOfWeekKey(selectedDate));
+      setRangeEnd(getEndOfWeekKey(selectedDate));
+      return;
+    }
+
+    if (preset === "month") {
+      setRangeStart(getStartOfMonthKey(selectedDate));
+      setRangeEnd(getEndOfMonthKey(selectedDate));
+      return;
+    }
+
+    setRangeStart(addDaysKey(selectedDate, -6));
+    setRangeEnd(selectedDate);
   }
 
   return (
     <section id="today" className="workbench">
       <div className="page-title">
         <div>
-          <p className="eyebrow">今日学习入口</p>
-          <h2>{formatDate(todayKey)} · 听说读写</h2>
+          <p className="eyebrow">每日学习入口</p>
+          <h2>{formatDate(selectedDate)} · 听说读写</h2>
         </div>
         <span className="status-pill">{completedCount}/{taskCount} 已完成</span>
       </div>
+      {progressError && <div className="inline-alert">{progressError}</div>}
+
+      <Paper component="section" className="panel calendar-panel" withBorder shadow="sm" radius="md" p="lg">
+        <div className="control-grid">
+          <div>
+            <p className="eyebrow">Calendar</p>
+            <h3>切换日期</h3>
+          </div>
+          <div className="date-controls">
+            <button type="button" onClick={() => moveSelectedDate(-1)} aria-label="前一天">‹</button>
+            <label className="date-field">
+              <span>待办日期</span>
+              <input
+                type="date"
+                value={selectedDate}
+                onChange={(event) => setSelectedDate(event.target.value || todayKey)}
+              />
+            </label>
+            <button type="button" onClick={() => moveSelectedDate(1)} aria-label="后一天">›</button>
+            <button type="button" onClick={() => setSelectedDate(todayKey)}>今天</button>
+          </div>
+        </div>
+      </Paper>
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md" className="dashboard-grid mantine-dashboard">
         <Paper component="section" className="panel today-plan" withBorder shadow="sm" radius="md" p="lg">
@@ -251,13 +402,65 @@ function TodayWorkbench({ data }) {
         <Paper component="section" className="panel focus-panel" withBorder shadow="sm" radius="md" p="lg">
           <div className="panel-head">
             <div>
-              <p className="eyebrow">Focus</p>
-              <h3>当前重点</h3>
+              <p className="eyebrow">Stats</p>
+              <h3>完成统计</h3>
             </div>
           </div>
+          <div className="stats-controls">
+            <div className="segmented">
+              <button type="button" onClick={() => applyRangePreset("week")}>本周</button>
+              <button type="button" onClick={() => applyRangePreset("month")}>本月</button>
+              <button type="button" onClick={() => applyRangePreset("recent")}>近 7 天</button>
+            </div>
+            <div className="range-fields">
+              <label className="date-field">
+                <span>开始</span>
+                <input
+                  type="date"
+                  value={rangeStart}
+                  onChange={(event) => setRangeStart(event.target.value || rangeStart)}
+                />
+              </label>
+              <label className="date-field">
+                <span>结束</span>
+                <input
+                  type="date"
+                  value={rangeEnd}
+                  onChange={(event) => setRangeEnd(event.target.value || rangeEnd)}
+                />
+              </label>
+            </div>
+          </div>
+          <div className="stats-summary">
+            <div>
+              <strong>{stats.completedTasks}</strong>
+              <span>已完成任务</span>
+            </div>
+            <div>
+              <strong>{stats.totalTasks}</strong>
+              <span>范围内任务</span>
+            </div>
+            <div>
+              <strong>{stats.completionRate}%</strong>
+              <span>完成率</span>
+            </div>
+          </div>
+          <Progress
+            value={stats.completionRate}
+            color="teal"
+            radius="xl"
+            mt="md"
+            aria-label="日期范围完成率"
+          />
           <div className="stack">
-            <Mini title={dailyPlan.focus}>任务项已经固化在系统里。除非你明确要求新增、删除或调整任务，否则每天沿用同一套清单。</Mini>
-            <Mini title="记录方式">每天只记录当天每个任务是否完成，后续可以按周或按月统计完成情况。</Mini>
+            <Mini title={`${formatDate(rangeStart)} - ${formatDate(rangeEnd)}`}>
+              已按 {stats.dayCount} 天统计，数据源：{getProgressStoreName()}。
+            </Mini>
+            {stats.byCategory.map((category) => (
+              <Mini key={category.id} title={`${category.title}：${category.completed}/${category.total}`}>
+                完成率 {category.completionRate}%。
+              </Mini>
+            ))}
           </div>
         </Paper>
       </SimpleGrid>
@@ -496,9 +699,113 @@ function getTaskKey(categoryId, taskId) {
 
 function getTodayDateKey() {
   const today = new Date();
-  const year = today.getFullYear();
-  const month = String(today.getMonth() + 1).padStart(2, "0");
-  const day = String(today.getDate()).padStart(2, "0");
+  return dateToKey(today);
+}
+
+function buildRangeStats(categories, startKey, endKey, rangeRecords) {
+  const dates = getDateRangeKeys(startKey, endKey);
+  const byCategory = categories.map((category) => {
+    const tasks = category.tasks || [];
+    const completed = dates.reduce(
+      (sum, dateKey) =>
+        sum +
+        tasks.filter((task) =>
+          rangeRecords.some(
+            (record) =>
+              record.dateKey === dateKey &&
+              record.categoryId === category.id &&
+              record.taskId === task.id &&
+              record.completed
+          )
+        ).length,
+      0
+    );
+    const total = dates.length * tasks.length;
+
+    return {
+      id: category.id,
+      title: category.title,
+      completed,
+      total,
+      completionRate: getCompletionRate(completed, total)
+    };
+  });
+  const completedTasks = byCategory.reduce((sum, category) => sum + category.completed, 0);
+  const totalTasks = byCategory.reduce((sum, category) => sum + category.total, 0);
+
+  return {
+    dayCount: dates.length,
+    completedTasks,
+    totalTasks,
+    completionRate: getCompletionRate(completedTasks, totalTasks),
+    byCategory
+  };
+}
+
+function getCompletionRate(completed, total) {
+  if (!total) return 0;
+  return Math.round((completed / total) * 100);
+}
+
+function getDateRangeKeys(startKey, endKey) {
+  const startDate = parseDateKey(startKey);
+  const endDate = parseDateKey(endKey);
+  if (!startDate || !endDate) return [];
+
+  const first = startDate <= endDate ? startDate : endDate;
+  const last = startDate <= endDate ? endDate : startDate;
+  const dates = [];
+  let cursor = new Date(first);
+
+  while (cursor <= last) {
+    dates.push(dateToKey(cursor));
+    cursor = addDays(cursor, 1);
+  }
+
+  return dates;
+}
+
+function getStartOfWeekKey(dateKey) {
+  const date = parseDateKey(dateKey) || new Date();
+  const day = date.getDay() || 7;
+  return dateToKey(addDays(date, 1 - day));
+}
+
+function getEndOfWeekKey(dateKey) {
+  const start = parseDateKey(getStartOfWeekKey(dateKey));
+  return dateToKey(addDays(start, 6));
+}
+
+function getStartOfMonthKey(dateKey) {
+  const date = parseDateKey(dateKey) || new Date();
+  return dateToKey(new Date(date.getFullYear(), date.getMonth(), 1));
+}
+
+function getEndOfMonthKey(dateKey) {
+  const date = parseDateKey(dateKey) || new Date();
+  return dateToKey(new Date(date.getFullYear(), date.getMonth() + 1, 0));
+}
+
+function addDaysKey(dateKey, offset) {
+  const date = parseDateKey(dateKey) || new Date();
+  return dateToKey(addDays(date, offset));
+}
+
+function addDays(date, offset) {
+  const next = new Date(date);
+  next.setDate(next.getDate() + offset);
+  return next;
+}
+
+function parseDateKey(dateKey) {
+  const date = new Date(`${dateKey}T00:00:00`);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+function dateToKey(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
 }
 
@@ -506,6 +813,10 @@ function getStatusText(status, data) {
   if (status === "loading") return "正在读取本地数据...";
   if (status === "error") return "本地数据读取失败";
   return `已读取 ${data.materials.length} 份素材、${data.expressions.length} 个表达、${data.practices.length} 个练习`;
+}
+
+function getBasePath() {
+  return "/site/";
 }
 
 function matchesTag(item, selectedTag) {
