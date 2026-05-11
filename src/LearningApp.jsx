@@ -98,7 +98,7 @@ export default function LearningApp() {
       <main>
         {status === "error" && (
           <div className="empty-state">
-            数据读取失败。请运行开发服务器后访问 <strong>http://localhost:4173/site/</strong>。
+            数据读取失败。请运行开发服务器后访问 <strong>http://localhost:4173/</strong>。
           </div>
         )}
 
@@ -166,7 +166,7 @@ export function TodayPlanPage() {
       <main>
         {status === "error" && (
           <div className="empty-state">
-            数据读取失败。请运行开发服务器后访问 <strong>http://localhost:4173/site/today</strong>。
+            数据读取失败。请运行开发服务器后访问 <strong>http://localhost:4173/today</strong>。
           </div>
         )}
 
@@ -816,7 +816,7 @@ function getStatusText(status, data) {
 }
 
 function getBasePath() {
-  return "/site/";
+  return "/";
 }
 
 function matchesTag(item, selectedTag) {

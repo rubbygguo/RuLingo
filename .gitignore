@@ -16,6 +16,8 @@ src/.umi-production/
 .env
 .env.*
 !.env.example
+scripts/cos-deploy.local.json
+scripts/.coscli.local.yaml
 
 # Logs & debug
 *.log

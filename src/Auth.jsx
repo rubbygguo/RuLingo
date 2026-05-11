@@ -115,7 +115,7 @@ export function LoginPage() {
 }
 
 export function getBasePath() {
-  return "/site/";
+  return "/";
 }
 
 function redirectToLogin() {

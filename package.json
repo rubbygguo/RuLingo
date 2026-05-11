@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "PORT=4173 max dev",
     "build": "max build",
+    "deploy:cos": "node scripts/deploy-cos.mjs",
     "preview": "PORT=4173 max preview"
   },
   "dependencies": {

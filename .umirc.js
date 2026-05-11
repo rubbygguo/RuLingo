@@ -1,8 +1,9 @@
 import { defineConfig } from "@umijs/max";
 
 export default defineConfig({
-  base: "/site/",
+  base: "/",
   publicPath: "/",
+  hash: true,
   history: { type: "browser" },
   mountElementId: "root",
   npmClient: "npm",

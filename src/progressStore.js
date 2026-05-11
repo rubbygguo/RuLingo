@@ -222,9 +222,23 @@ function registerCloudbaseModules() {
   const registerAuth = resolveModuleFunction(authModule, "registerAuth");
   const registerMySQL = resolveModuleFunction(mysqlModule, "registerMySQL");
 
-  registerAuth(cloudbase);
-  registerMySQL(cloudbase);
+  registerCloudbaseModule(registerAuth, cloudbase);
+  registerCloudbaseModule(registerMySQL, cloudbase);
   cloudbaseModulesRegistered = true;
+}
+
+function registerCloudbaseModule(registerModule, appModule) {
+  try {
+    registerModule(appModule);
+  } catch (error) {
+    if (isDuplicateComponentError(error)) return;
+    throw error;
+  }
+}
+
+function isDuplicateComponentError(error) {
+  const message = typeof error?.message === "string" ? error.message : String(error || "");
+  return message.includes("Duplicate component");
 }
 
 function resolveCloudbaseModule(moduleValue) {
