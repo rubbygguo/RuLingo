@@ -30,15 +30,16 @@ data/daily-packs/YYYY-MM-DD.json
 
 5. Validate that the JSON follows the DailyPack snapshot structure defined in `materials-system/rules/每日素材包生成规则.md`.
 6. Run `npm run build` after code changes. If only JSON changes and no code changed, build is optional but recommended before upload when practical.
-7. Upload with:
+7. Before upload, run the "CloudBase Upload Preflight" checks below. Do not skip this when the upload will be run from Codex.
+8. Upload with:
 
 ```bash
 npm run daily-pack:upload -- --file=data/daily-packs/YYYY-MM-DD.json
 ```
 
-8. Treat every successful upload as an override of that day's current pack. Do not distinguish inserted vs updated in user-facing summaries.
-9. If upload fails due to missing local config, follow "CloudBase Upload Config Bootstrap" and retry after the user provides the missing values.
-10. Summarize the generated date, theme, skill sections, override upload result, and any verification performed.
+9. Treat every successful upload as an override of that day's current pack. Do not distinguish inserted vs updated in user-facing summaries.
+10. If upload fails due to missing local config, follow "CloudBase Upload Config Bootstrap" and retry after the user provides the missing values.
+11. Summarize the generated date, theme, skill sections, override upload result, and any verification performed.
 
 ## CloudBase Upload Config Bootstrap
 
@@ -79,6 +80,24 @@ Docs/cloudbase-mysql-daily-pack-snapshots.sql
 ```
 
 If upload fails because the table does not exist, instruct the user to execute that SQL in CloudBase MySQL, then rerun the upload command.
+
+## CloudBase Upload Preflight
+
+Before running the official upload command from Codex, verify that the Node process can reach CloudBase. The CloudBase JS SDK may wrap network or DNS failures as an `UNKNOWN` `signInWithPassword` error with a misleading username/password hint, so do not assume credentials are wrong until the network path is checked.
+
+Run a DNS preflight for the configured CloudBase endpoint:
+
+```bash
+node -e "const dns=require('dns'); const host='<env>.<region>.tcb-api.tencentcloudapi.com'; console.log('servers', dns.getServers()); dns.lookup(host,{all:true},(e,a)=>console.log(e&&{code:e.code,message:e.message},a));"
+```
+
+If Codex sandbox Node reports only `127.0.0.1` as DNS server, or returns `ENOTFOUND` / `ECONNREFUSED`, compare with `curl -I https://<env>.<region>.tcb-api.tencentcloudapi.com`. If `curl` works but Node does not, the failure is the Codex/Node DNS environment, not the user's RuLingo username/password and not the daily pack JSON fields. Use a non-sandbox Node execution or ask the user to run the official command locally.
+
+When diagnosing upload failures:
+
+- Auth failure before `app.mysql().from(...).upsert(...)` means no database write was attempted.
+- A message like `signInWithPassword 失败 [UNKNOWN]` can be a wrapped fetch/DNS failure. Inspect the underlying request error before changing content fields or credentials.
+- Do not use a browser fallback unless the user explicitly asks for it; the official script path must be diagnosed separately.
 
 ## Override Behavior
 
