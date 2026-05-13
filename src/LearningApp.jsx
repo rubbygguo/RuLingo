@@ -1,16 +1,23 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Badge,
+  Burger,
+  Button,
   Card as MantineCard,
   Checkbox,
+  Drawer,
   Group,
+  NavLink,
   Paper,
   Progress,
+  ScrollArea,
   SimpleGrid,
   Stack as MantineStack,
   Text,
+  TextInput,
   Title
 } from "@mantine/core";
+import { useDisclosure } from "@mantine/hooks";
 import { loadLearningData } from "./dataClient.js";
 import {
   getProgressStoreName,
@@ -86,16 +93,13 @@ export default function LearningApp() {
     filteredMaterials.length + filteredExpressions.length + filteredPractices.length > 0;
 
   return (
-    <div className="app-shell">
-      <Sidebar
-        query={query}
-        setQuery={setQuery}
-        activeSection={activeSection}
-        setActiveSection={setActiveSection}
-        statusText={getStatusText(status, data)}
-      />
-
-      <main>
+    <ResponsiveShell
+      query={query}
+      setQuery={setQuery}
+      activeSection={activeSection}
+      setActiveSection={setActiveSection}
+      statusText={getStatusText(status, data)}
+    >
         {status === "error" && (
           <div className="empty-state">
             数据读取失败。请运行开发服务器后访问 <strong>http://localhost:4173/</strong>。
@@ -125,8 +129,7 @@ export default function LearningApp() {
             )}
           </>
         )}
-      </main>
-    </div>
+    </ResponsiveShell>
   );
 }
 
@@ -154,16 +157,14 @@ export function TodayPlanPage() {
   }, []);
 
   return (
-    <div className="app-shell">
-      <Sidebar
-        query=""
-        setQuery={() => {}}
-        activeSection="today"
-        setActiveSection={() => {}}
-        statusText={getStatusText(status, data)}
-      />
-
-      <main>
+    <ResponsiveShell
+      query=""
+      setQuery={() => {}}
+      activeSection="today"
+      setActiveSection={() => {}}
+      statusText={getStatusText(status, data)}
+      searchDisabled
+    >
         {status === "error" && (
           <div className="empty-state">
             数据读取失败。请运行开发服务器后访问 <strong>http://localhost:4173/today</strong>。
@@ -171,64 +172,158 @@ export function TodayPlanPage() {
         )}
 
         {status !== "error" && <TodayWorkbench data={data} />}
-      </main>
+    </ResponsiveShell>
+  );
+}
+
+function ResponsiveShell({
+  children,
+  query,
+  setQuery,
+  activeSection,
+  setActiveSection,
+  statusText,
+  searchDisabled = false
+}) {
+  const [navOpened, { close: closeNav, toggle: toggleNav }] = useDisclosure(false);
+  const navItems = getNavItems();
+
+  return (
+    <div className="app-shell">
+      <header className="mobile-topbar">
+        <Burger
+          opened={navOpened}
+          onClick={toggleNav}
+          aria-label={navOpened ? "关闭导航" : "打开导航"}
+          color="#203040"
+          size="sm"
+        />
+        <div className="mobile-brand">
+          <span>RuLingo</span>
+          <strong>{navItems.find((item) => item.id === activeSection)?.label || "RuLingo"}</strong>
+        </div>
+      </header>
+
+      <aside className="sidebar desktop-sidebar">
+        <SidebarContent
+          query={query}
+          setQuery={setQuery}
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+          statusText={statusText}
+          searchDisabled={searchDisabled}
+        />
+      </aside>
+
+      <Drawer
+        opened={navOpened}
+        onClose={closeNav}
+        title="RuLingo"
+        padding="md"
+        size="min(86vw, 340px)"
+        classNames={{ body: "mobile-drawer-body", header: "mobile-drawer-header" }}
+      >
+        <SidebarContent
+          query={query}
+          setQuery={setQuery}
+          activeSection={activeSection}
+          setActiveSection={setActiveSection}
+          statusText={statusText}
+          searchDisabled={searchDisabled}
+          onNavigate={closeNav}
+        />
+      </Drawer>
+
+      <main>{children}</main>
+
+      <nav className="mobile-bottom-nav" aria-label="移动端主导航">
+        {navItems.map((item) => (
+          <a
+            key={item.id}
+            href={item.href}
+            className={activeSection === item.id ? "active" : ""}
+            onClick={() => setActiveSection(item.id)}
+          >
+            <span>{item.shortLabel}</span>
+          </a>
+        ))}
+      </nav>
     </div>
   );
 }
 
-function Sidebar({ query, setQuery, activeSection, setActiveSection, statusText }) {
-  const navItems = [
-    ["today", "今日计划", `${getBasePath()}today`],
-    ["materials", "素材库", `${getBasePath()}#materials`],
-    ["expressions", "表达库", `${getBasePath()}#expressions`],
-    ["practices", "练习库", `${getBasePath()}#practices`],
-    ["writing", "写作", `${getBasePath()}#writing`],
-    ["review", "复盘", `${getBasePath()}#review`]
-  ];
+function SidebarContent({
+  query,
+  setQuery,
+  activeSection,
+  setActiveSection,
+  statusText,
+  searchDisabled,
+  onNavigate
+}) {
+  const navItems = getNavItems();
+
+  async function signOut() {
+    await signOutProgressUser();
+    window.location.replace(`${getBasePath()}login`);
+  }
 
   return (
-    <aside className="sidebar">
+    <div className="sidebar-content">
       <div className="brand">
         <p className="eyebrow">Local English Learning System</p>
-        <h1>英文提升</h1>
+        <h1>RuLingo</h1>
       </div>
 
-      <label className="search-box">
-        <span aria-hidden="true">⌕</span>
-        <input
+      {!searchDisabled && (
+        <TextInput
           type="search"
+          aria-label="搜索素材、表达、题目"
           placeholder="搜索素材、表达、题目"
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onChange={(event) => setQuery(event.currentTarget.value)}
+          leftSection="⌕"
+          className="sidebar-search"
         />
-      </label>
+      )}
 
-      <nav className="nav" aria-label="主导航">
-        {navItems.map(([id, label, href]) => (
-          <a
-            key={id}
-            href={href}
-            className={activeSection === id ? "active" : ""}
-            onClick={() => setActiveSection(id)}
-          >
-            {label}
-          </a>
-        ))}
-      </nav>
+      <ScrollArea.Autosize mah="42vh" type="auto">
+        <nav className="nav" aria-label="主导航">
+          {navItems.map((item) => (
+            <NavLink
+              key={item.id}
+              component="a"
+              href={item.href}
+              label={item.label}
+              active={activeSection === item.id}
+              onClick={() => {
+                setActiveSection(item.id);
+                onNavigate?.();
+              }}
+            />
+          ))}
+        </nav>
+      </ScrollArea.Autosize>
 
       <div className="sidebar-note">{statusText}</div>
-      <button
-        type="button"
-        className="sidebar-logout"
-        onClick={async () => {
-          await signOutProgressUser();
-          window.location.replace(`${getBasePath()}login`);
-        }}
-      >
+      <Button variant="subtle" color="gray" className="sidebar-logout" onClick={signOut} fullWidth>
         退出登录
-      </button>
-    </aside>
+      </Button>
+    </div>
   );
+}
+
+function getNavItems() {
+  const navItems = [
+    ["today", "今日计划", "今日", `${getBasePath()}today`],
+    ["materials", "素材库", "素材", `${getBasePath()}#materials`],
+    ["expressions", "表达库", "表达", `${getBasePath()}#expressions`],
+    ["practices", "练习库", "练习", `${getBasePath()}#practices`],
+    ["writing", "写作", "写作", `${getBasePath()}#writing`],
+    ["review", "复盘", "复盘", `${getBasePath()}#review`]
+  ];
+
+  return navItems.map(([id, label, shortLabel, href]) => ({ id, label, shortLabel, href }));
 }
 
 export function TodayWorkbench({ data }) {
@@ -349,26 +444,25 @@ export function TodayWorkbench({ data }) {
       </div>
       {progressError && <div className="inline-alert">{progressError}</div>}
 
-      <Paper component="section" className="panel calendar-panel" withBorder shadow="sm" radius="md" p="lg">
-        <div className="control-grid">
-          <div>
+      <Paper component="section" className="panel calendar-panel compact-date-panel" withBorder shadow="sm" radius="md" p="md">
+        <Group justify="space-between" align="flex-end" gap="sm" wrap="wrap" className="compact-date-bar">
+          <div className="compact-date-title">
             <p className="eyebrow">Calendar</p>
             <h3>切换日期</h3>
           </div>
-          <div className="date-controls">
-            <button type="button" onClick={() => moveSelectedDate(-1)} aria-label="前一天">‹</button>
-            <label className="date-field">
-              <span>待办日期</span>
-              <input
-                type="date"
-                value={selectedDate}
-                onChange={(event) => setSelectedDate(event.target.value || todayKey)}
-              />
-            </label>
-            <button type="button" onClick={() => moveSelectedDate(1)} aria-label="后一天">›</button>
-            <button type="button" onClick={() => setSelectedDate(todayKey)}>今天</button>
-          </div>
-        </div>
+          <Group gap="xs" wrap="nowrap" className="date-controls compact-date-controls">
+            <Button variant="default" px="xs" onClick={() => moveSelectedDate(-1)} aria-label="前一天">‹</Button>
+            <TextInput
+              type="date"
+              aria-label="待办日期"
+              value={selectedDate}
+              onChange={(event) => setSelectedDate(event.currentTarget.value || todayKey)}
+              className="compact-date-input"
+            />
+            <Button variant="default" px="xs" onClick={() => moveSelectedDate(1)} aria-label="后一天">›</Button>
+            <Button variant="light" color="teal" onClick={() => setSelectedDate(todayKey)}>今天</Button>
+          </Group>
+        </Group>
       </Paper>
 
       <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md" className="dashboard-grid mantine-dashboard">

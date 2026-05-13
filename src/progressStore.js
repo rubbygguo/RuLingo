@@ -60,43 +60,77 @@ export function getProgressStoreName() {
 export async function getCurrentProgressUser() {
   if (!isCloudbaseConfigured()) return { id: "local", name: "本机用户" };
 
-  const storedUsername = getStoredUsername();
-  if (!storedUsername) return null;
+  const storedLoginIdentifier = getStoredLoginIdentifier();
+  if (!storedLoginIdentifier) return null;
 
   const { auth } = await getCloudbaseApp();
   const user = await getAuthenticatedUser(auth);
-  const id = storedUsername || getUserId(user);
+  const id = getUserId(user) || storedLoginIdentifier;
 
   return id ? { id, name: getUserName(user) } : null;
 }
 
-export async function signInProgressUser(username, password) {
+export async function signInProgressUser(loginIdentifier, password) {
   const { auth } = await getCloudbaseApp();
-  const result = await auth.signInWithPassword({ username, password });
+  const credential = buildPasswordCredential(loginIdentifier, password);
+  const result = await auth.signInWithPassword(credential);
 
   if (result?.error) {
-    throw new Error(result.error.message || "用户名或密码登录失败");
+    throw new Error(getCloudbaseErrorMessage(result.error, "用户名或密码登录失败"));
   }
 
-  storeUsername(username);
+  storeLoginIdentifier(loginIdentifier);
   return getCurrentProgressUser();
 }
 
-export async function signUpProgressUser(username, password) {
+export async function signUpProgressUser(loginIdentifier, password) {
   const { auth } = await getCloudbaseApp();
-  const result = await auth.signUp({ username, password });
+  const credential = buildSignUpCredential(loginIdentifier, password);
+  const result = await auth.signUp(credential);
 
   if (result?.error) {
-    throw new Error(result.error.message || "用户名注册失败");
+    throw new Error(getCloudbaseErrorMessage(result.error, "账号注册失败"));
   }
 
+  storeLoginIdentifier(loginIdentifier);
   if (result?.data?.session) return getCurrentProgressUser();
-  return signInProgressUser(username, password);
+  return signInProgressUser(loginIdentifier, password);
+}
+
+export async function sendProgressEmailLoginCode(emailAddress) {
+  const email = normalizeLoginIdentifier(emailAddress);
+  if (!isEmailIdentifier(email)) {
+    throw new Error("请输入有效的邮箱地址");
+  }
+
+  const { auth } = await getCloudbaseApp();
+  return auth.getVerification({ email });
+}
+
+export async function signInProgressUserWithEmailCode(emailAddress, verificationCode, verificationInfo) {
+  const email = normalizeLoginIdentifier(emailAddress);
+  if (!isEmailIdentifier(email)) throw new Error("请输入有效的邮箱地址");
+  if (!verificationCode) throw new Error("请输入邮箱验证码");
+  if (!verificationInfo?.verification_id) throw new Error("请先发送邮箱验证码");
+
+  const { auth } = await getCloudbaseApp();
+  const result = await auth.signInWithEmail({
+    verificationInfo,
+    verificationCode,
+    email
+  });
+
+  if (result?.error) {
+    throw new Error(getCloudbaseErrorMessage(result.error, "邮箱验证码登录失败"));
+  }
+
+  storeLoginIdentifier(email);
+  return getCurrentProgressUser();
 }
 
 export async function signOutProgressUser() {
   if (!isCloudbaseConfigured()) return;
-  clearStoredUsername();
+  clearStoredLoginIdentifier();
   const { auth } = await getCloudbaseApp();
   await auth.signOut();
   cloudbaseClientPromise = null;
@@ -157,7 +191,7 @@ async function migrateLocalDayCompletions(dateKey) {
 async function initCloudbaseClient() {
   const { app, auth } = await getCloudbaseApp();
   const user = await getAuthenticatedUser(auth);
-  const ownerId = getUserId(user) || getStoredUsername();
+  const ownerId = getUserId(user) || getStoredLoginIdentifier();
 
   if (!ownerId) {
     throw new Error("CloudBase 尚未登录，无法确定当前用户");
@@ -199,20 +233,60 @@ function getUserId(user) {
 }
 
 function getUserName(user) {
-  return user?.username || getStoredUsername() || user?.name || user?.email || user?.phone_number || user?.uid || user?.id || "已登录用户";
+  return user?.username || user?.email || user?.name || getStoredLoginIdentifier() || user?.phone_number || user?.uid || user?.id || "已登录用户";
 }
 
-function storeUsername(username) {
+function buildPasswordCredential(loginIdentifier, password) {
+  const identifier = normalizeLoginIdentifier(loginIdentifier);
+  assertLoginCredential(identifier, password);
+
+  return {
+    username: identifier,
+    password
+  };
+}
+
+function buildSignUpCredential(loginIdentifier, password) {
+  const identifier = normalizeLoginIdentifier(loginIdentifier);
+  if (isEmailIdentifier(identifier)) {
+    throw new Error("邮箱请使用验证码登录；账号密码注册请填写用户名");
+  }
+  assertLoginCredential(identifier, password);
+
+  return {
+    username: identifier,
+    password
+  };
+}
+
+function assertLoginCredential(loginIdentifier, password) {
+  if (!loginIdentifier) throw new Error("请输入用户名");
+  if (!password) throw new Error("请输入密码");
+}
+
+function normalizeLoginIdentifier(loginIdentifier) {
+  return String(loginIdentifier || "").trim();
+}
+
+function isEmailIdentifier(loginIdentifier) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginIdentifier);
+}
+
+function getCloudbaseErrorMessage(error, fallbackMessage) {
+  return error?.helpMessage || error?.message || error?.error_description || fallbackMessage;
+}
+
+function storeLoginIdentifier(loginIdentifier) {
   if (typeof window === "undefined") return;
-  window.localStorage.setItem("rulingo-cloudbase-username", username.trim());
+  window.localStorage.setItem("rulingo-cloudbase-username", normalizeLoginIdentifier(loginIdentifier));
 }
 
-function getStoredUsername() {
+function getStoredLoginIdentifier() {
   if (typeof window === "undefined") return "";
   return window.localStorage.getItem("rulingo-cloudbase-username") || "";
 }
 
-function clearStoredUsername() {
+function clearStoredLoginIdentifier() {
   if (typeof window === "undefined") return;
   window.localStorage.removeItem("rulingo-cloudbase-username");
 }
