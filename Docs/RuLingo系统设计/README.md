@@ -29,6 +29,7 @@ materials-system/rules/
 
 ## 当前文档
 
+- `当前系统需求.md`：记录 RuLingo 当前已经确认的产品需求、能力边界和待后续设计的问题。
 - `语音练习记录上传设计草案.md`：讨论如何把每日语音练习沉淀上传到 CloudBase MySQL，并让 RuLingo 前端读取展示。
 
 ## 文档状态标记

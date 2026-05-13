@@ -20,8 +20,12 @@ import {
 } from "@mantine/core";
 import { loadDailyPackSnapshot } from "./dailyPackClient.js";
 import { ResponsiveShell } from "./LearningApp.jsx";
+import { mockDailyPackSnapshot } from "./mockDailyPackData.js";
 
-const responseStoreKey = "rulingo:daily-pack:2026-05-13:responses";
+const useMockDailyPack = false;
+const responseStoreKey = useMockDailyPack
+  ? `rulingo:daily-pack:${mockDailyPackSnapshot.date}:mock:responses`
+  : "rulingo:daily-pack:2026-05-13:responses";
 
 export function DailyPackPage() {
   const [snapshot, setSnapshot] = useState(null);
@@ -30,6 +34,12 @@ export function DailyPackPage() {
   const [responses, setResponses] = useState({});
 
   useEffect(() => {
+    if (useMockDailyPack) {
+      setSnapshot(mockDailyPackSnapshot);
+      setStatus("mock");
+      return undefined;
+    }
+
     let ignore = false;
 
     loadDailyPackSnapshot("2026-05-13")
@@ -129,6 +139,12 @@ function DailyPackWorkbench({ pack, completion, responses, setResponses }) {
 
   return (
     <section className="daily-pack-page">
+      {useMockDailyPack && (
+        <Alert color="blue" variant="light" radius="md" mb="md">
+          当前为 mock data 开发模式：用于验证新数据结构和页面交互，不读取 CloudBase。
+        </Alert>
+      )}
+
       <Paper className="daily-pack-hero" withBorder radius="md" p="lg">
         <Group justify="space-between" align="flex-start" gap="lg">
           <div>
@@ -157,7 +173,6 @@ function DailyPackWorkbench({ pack, completion, responses, setResponses }) {
                 {section.label}
               </Tabs.Tab>
             ))}
-            <Tabs.Tab value="expressions">表达</Tabs.Tab>
             <Tabs.Tab value="feedback">反馈包</Tabs.Tab>
           </Tabs.List>
         </ScrollArea>
@@ -167,10 +182,6 @@ function DailyPackWorkbench({ pack, completion, responses, setResponses }) {
             <SkillSection section={section} responses={responses} setResponses={setResponses} />
           </Tabs.Panel>
         ))}
-
-        <Tabs.Panel value="expressions" pt="md">
-          <ExpressionPool expressions={pack.expressionPool || []} responses={responses} setResponses={setResponses} />
-        </Tabs.Panel>
 
         <Tabs.Panel value="feedback" pt="md">
           <FeedbackPackage pack={pack} responses={responses} />
@@ -183,16 +194,13 @@ function DailyPackWorkbench({ pack, completion, responses, setResponses }) {
 function SkillSection({ section, responses, setResponses }) {
   return (
     <Stack gap="md">
-      <Paper withBorder radius="md" p="lg">
+      <Paper withBorder radius="md" p="lg" className="daily-pack-skill-summary">
         <Group justify="space-between" align="flex-start" gap="md">
           <div>
-            <Text className="eyebrow">{section.skill}</Text>
+            <Text className="eyebrow">{section.skill} · 今日练习核心主题</Text>
             <Title order={2}>
               {section.label}：{section.theme}
             </Title>
-            <Text c="dimmed" mt="xs" maw={780}>
-              {section.goal}
-            </Text>
           </div>
           <Badge color={getPackColor()} variant="light" size="lg">
             {section.units.length} units
@@ -201,11 +209,14 @@ function SkillSection({ section, responses, setResponses }) {
       </Paper>
 
       <Accordion variant="separated" radius="md" defaultValue={section.units[0]?.id}>
-        {section.units.map((unit) => (
+        {section.units.map((unit, index) => (
           <Accordion.Item key={unit.id} value={unit.id}>
             <Accordion.Control>
               <Group justify="space-between" gap="md" wrap="nowrap">
                 <div>
+                  <Text className="eyebrow" mb={4}>
+                    Unit {index + 1}
+                  </Text>
                   <Text fw={850}>{unit.title}</Text>
                   <Group gap={6} mt={6}>
                     {unit.tags.map((tag) => (
@@ -233,6 +244,9 @@ function SkillSection({ section, responses, setResponses }) {
 }
 
 function UnitContent({ unit, skill, responses, setResponses }) {
+  const learningItems = unit.learningItems || [];
+  const tasks = unit.tasks || [];
+
   return (
     <Stack gap="md">
       <Text c="dimmed">{unit.instructions}</Text>
@@ -243,33 +257,189 @@ function UnitContent({ unit, skill, responses, setResponses }) {
         ))}
       </SimpleGrid>
 
-      {unit.targetExpressions.length > 0 && (
-        <Paper withBorder radius="md" p="md" bg="var(--mantine-color-gray-0)">
-          <Text fw={800} mb="xs">
-            本单元目标表达
-          </Text>
-          <Group gap="xs">
-            {unit.targetExpressions.map((expression) => (
-              <Badge key={expression} color={getPackColor()} variant="outline" radius="sm">
-                {expression}
-              </Badge>
-            ))}
-          </Group>
-        </Paper>
+      {learningItems.length > 0 && (
+        <LearningItemsPanel
+          items={learningItems}
+          responses={responses}
+          setResponses={setResponses}
+        />
       )}
 
-      <Stack gap="sm">
-        <Text fw={850}>练习任务</Text>
-        {unit.tasks.map((task) => (
-          <TaskCard
-            key={task.id}
-            task={task}
+      {tasks.length > 0 && (
+        <Stack gap="sm">
+          <Text fw={850}>练习任务</Text>
+          {tasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              responses={responses}
+              setResponses={setResponses}
+            />
+          ))}
+        </Stack>
+      )}
+
+      <UnitFeedback unit={unit} responses={responses} setResponses={setResponses} />
+    </Stack>
+  );
+}
+
+function LearningItemsPanel({ items, responses, setResponses }) {
+  return (
+    <Stack gap="xs" className="daily-pack-learning-section">
+      <Group className="daily-pack-subsection-title" justify="space-between" align="center">
+        <div>
+          <Text className="eyebrow">Language Focus</Text>
+          <Text fw={900}>语言点预处理</Text>
+        </div>
+        <Badge color={getPackColor()} variant="light" radius="sm">
+          {items.length} items
+        </Badge>
+      </Group>
+      <Stack gap="xs">
+        {items.map((item) => (
+          <LearningItemCard
+            key={item.id}
+            item={item}
             responses={responses}
             setResponses={setResponses}
           />
         ))}
       </Stack>
     </Stack>
+  );
+}
+
+function LearningItemCard({ item, responses, setResponses }) {
+  const [expanded, setExpanded] = useState(false);
+  const itemResponse = responses.learningItems?.[item.id] || {};
+  const status = itemResponse.status || "";
+  const note = itemResponse.note || "";
+
+  function patchLearningItem(next) {
+    setResponses((current) => ({
+      ...current,
+      learningItems: {
+        ...(current.learningItems || {}),
+        [item.id]: {
+          ...(current.learningItems?.[item.id] || {}),
+          ...next
+        }
+      }
+    }));
+  }
+
+  return (
+    <Card withBorder radius="md" padding="sm" className="daily-pack-learning-item">
+      <Stack gap="xs">
+        <Group justify="space-between" align="flex-start" gap="sm" wrap="nowrap">
+          <Group gap="sm" align="flex-start" className="daily-pack-learning-main">
+            <Badge color={getLearningItemColor(item.type)} variant="light" radius="sm">
+              {getLearningItemLabel(item.type)}
+            </Badge>
+            <div className="daily-pack-learning-copy">
+              <Text fw={900} className="daily-pack-learning-term">
+                {item.text}
+              </Text>
+              {item.meaning && (
+                <Text c="dimmed" size="sm">
+                  {item.meaning}
+                </Text>
+              )}
+            </div>
+          </Group>
+        </Group>
+
+        <Group gap="xs" justify="space-between" align="center" wrap="nowrap">
+          <Group gap="xs" className="daily-pack-status-actions">
+            {[
+              ["mastered", "掌握"],
+              ["unfamiliar", "不熟"],
+              ["ignored", "忽略"]
+            ].map(([value, label]) => (
+              <Button
+                key={value}
+                size="xs"
+                radius="md"
+                variant={status === value ? "filled" : "light"}
+                color={status === value ? getPackColor() : "gray"}
+                onClick={() => patchLearningItem({ status: status === value ? "" : value })}
+              >
+                {label}
+              </Button>
+            ))}
+          </Group>
+          <Button
+            size="xs"
+            radius="md"
+            variant="subtle"
+            color="gray"
+            onClick={() => setExpanded((current) => !current)}
+          >
+            {expanded ? "收起" : "展开"}
+          </Button>
+        </Group>
+
+        {expanded && (
+          <Stack gap="xs" className="daily-pack-learning-detail">
+            {item.sourceSentence && (
+              <Paper withBorder radius="sm" p="sm" bg="var(--mantine-color-gray-0)">
+                <Text size="sm" c="dimmed">
+                  {item.sourceSentence}
+                </Text>
+              </Paper>
+            )}
+
+            {item.note && <Text size="sm">{item.note}</Text>}
+            {item.reusePrompt && (
+              <Text size="sm" c="dimmed">
+                {item.reusePrompt}
+              </Text>
+            )}
+
+            <Textarea
+              label="备注"
+              placeholder="比如：听的时候没反应过来 / 想下次继续追踪 / 我会用这个造句"
+              autosize
+              minRows={2}
+              value={note}
+              onChange={(event) => patchLearningItem({ note: event.currentTarget.value })}
+            />
+          </Stack>
+        )}
+      </Stack>
+    </Card>
+  );
+}
+
+function UnitFeedback({ unit, responses, setResponses }) {
+  const freeNote = responses.unitFeedback?.[unit.id]?.freeNote || "";
+
+  function patchUnitFeedback(next) {
+    setResponses((current) => ({
+      ...current,
+      unitFeedback: {
+        ...(current.unitFeedback || {}),
+        [unit.id]: {
+          ...(current.unitFeedback?.[unit.id] || {}),
+          ...next
+        }
+      }
+    }));
+  }
+
+  return (
+    <Card withBorder radius="md" padding="md">
+      <Textarea
+        label="我额外想标记的问题"
+        description="可以写系统漏掉的词、没听懂的句子、材料难度感受，或想让 Codex 下次继续追踪的问题。"
+        placeholder="例如：get the hang of 这个表达我没掌握，但系统没有单独列出来。"
+        autosize
+        minRows={4}
+        value={freeNote}
+        onChange={(event) => patchUnitFeedback({ freeNote: event.currentTarget.value })}
+      />
+    </Card>
   );
 }
 
@@ -380,58 +550,6 @@ function TaskCard({ task, responses, setResponses }) {
   );
 }
 
-function ExpressionPool({ expressions, responses, setResponses }) {
-  function toggleExpression(expressionId, checked) {
-    setResponses((current) => ({
-      ...current,
-      expressions: {
-        ...(current.expressions || {}),
-        [expressionId]: checked
-      }
-    }));
-  }
-
-  return (
-    <Stack gap="md">
-      <Paper withBorder radius="md" p="lg">
-        <Text className="eyebrow">Expression Asset Layer</Text>
-        <Title order={2}>今日表达池</Title>
-        <Text c="dimmed" mt="xs" maw={760}>
-          表达独立汇总，方便复习和勾选；每条表达保留服务于哪个技能和场景。
-        </Text>
-      </Paper>
-
-      <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="md">
-        {expressions.map((expression) => (
-          <Card key={expression.id} withBorder radius="md" padding="md">
-            <Checkbox
-              checked={Boolean(responses.expressions?.[expression.id])}
-              onChange={(event) => toggleExpression(expression.id, event.currentTarget.checked)}
-              label={
-                <Stack gap={6}>
-                  <Text fw={800}>{expression.text}</Text>
-                  <Group gap={6}>
-                    {expression.skills.map((skill) => (
-                      <Badge key={skill} color={getPackColor()} variant="light" radius="sm">
-                        {skill}
-                      </Badge>
-                    ))}
-                    {expression.tags.map((tag) => (
-                      <Badge key={tag} color="gray" variant="outline" radius="sm">
-                        {tag}
-                      </Badge>
-                    ))}
-                  </Group>
-                </Stack>
-              }
-            />
-          </Card>
-        ))}
-      </SimpleGrid>
-    </Stack>
-  );
-}
-
 function FeedbackPackage({ pack, responses }) {
   const feedbackText = buildFeedbackText(pack, responses);
 
@@ -441,7 +559,7 @@ function FeedbackPackage({ pack, responses }) {
         <Text className="eyebrow">Feedback Package</Text>
         <Title order={2}>给 Codex 的练后反馈包</Title>
         <Text c="dimmed" mt="xs" maw={760}>
-          这里不是复盘表单，只负责汇总完成状态、回答和勾选表达。复制后发给 Codex，由 Codex 在对话里引导复盘并整理沉淀。
+          这里不是复盘表单，只负责汇总完成状态、回答、语言点标记和自由反馈。复制后发给 Codex，由 Codex 在对话里引导复盘并整理沉淀。
         </Text>
       </Paper>
 
@@ -467,7 +585,7 @@ function FeedbackPackage({ pack, responses }) {
 
 function getCompletion(pack, responses) {
   if (!pack) return { done: 0, total: 0 };
-  const tasks = pack.sections.flatMap((section) => section.units.flatMap((unit) => unit.tasks));
+  const tasks = pack.sections.flatMap((section) => section.units.flatMap((unit) => unit.tasks || []));
   const done = tasks.filter((task) => responses.tasks?.[task.id]?.completed).length;
   return { done, total: tasks.length };
 }
@@ -475,20 +593,36 @@ function getCompletion(pack, responses) {
 function buildFeedbackText(pack, responses) {
   const completedTasks = [];
   const answeredTasks = [];
-  const selectedExpressions = [];
+  const learningItemFeedback = {
+    mastered: [],
+    unfamiliar: [],
+    ignored: [],
+    notes: []
+  };
+  const freeUnitFeedback = [];
 
   pack.sections.forEach((section) => {
     section.units.forEach((unit) => {
-      unit.tasks.forEach((task) => {
+      (unit.tasks || []).forEach((task) => {
         const response = responses.tasks?.[task.id];
         if (response?.completed) completedTasks.push(`${section.label} / ${unit.title}: ${task.prompt}`);
         if (response?.answer) answeredTasks.push(`${section.label} / ${unit.title} / ${task.answerLabel || "回答"}:\n${response.answer}`);
       });
-    });
-  });
 
-  pack.expressionPool?.forEach((expression) => {
-    if (responses.expressions?.[expression.id]) selectedExpressions.push(expression.text);
+      (unit.learningItems || []).forEach((item) => {
+        const response = responses.learningItems?.[item.id];
+        if (!response) return;
+
+        const itemLabel = `${section.label} / ${unit.title}: ${item.text}`;
+        if (response.status && learningItemFeedback[response.status]) {
+          learningItemFeedback[response.status].push(itemLabel);
+        }
+        if (response.note) learningItemFeedback.notes.push(`${itemLabel}\n  备注：${response.note}`);
+      });
+
+      const unitNote = responses.unitFeedback?.[unit.id]?.freeNote;
+      if (unitNote) freeUnitFeedback.push(`${section.label} / ${unit.title}:\n${unitNote}`);
+    });
   });
 
   return [
@@ -500,12 +634,24 @@ function buildFeedbackText(pack, responses) {
     "已完成任务：",
     completedTasks.length ? completedTasks.map((item) => `- ${item}`).join("\n") : "- 暂无",
     "",
-    "已勾选表达：",
-    selectedExpressions.length ? selectedExpressions.map((item) => `- ${item}`).join("\n") : "- 暂无",
+    "语言点标记：",
+    `已掌握：${formatFeedbackList(learningItemFeedback.mastered)}`,
+    `不熟：${formatFeedbackList(learningItemFeedback.unfamiliar)}`,
+    `忽略：${formatFeedbackList(learningItemFeedback.ignored)}`,
+    "",
+    "语言点备注：",
+    learningItemFeedback.notes.length ? learningItemFeedback.notes.map((item) => `- ${item}`).join("\n") : "- 暂无",
+    "",
+    "自由补充反馈：",
+    freeUnitFeedback.length ? freeUnitFeedback.join("\n\n") : "（暂无）",
     "",
     "任务回答 / 外部反馈：",
     answeredTasks.length ? answeredTasks.join("\n\n") : "（暂无）"
   ].join("\n");
+}
+
+function formatFeedbackList(items) {
+  return items.length ? `\n${items.map((item) => `- ${item}`).join("\n")}` : " 暂无";
 }
 
 function getStatusText(status, pack, completion) {
@@ -513,10 +659,33 @@ function getStatusText(status, pack, completion) {
   if (status === "not-configured") return "CloudBase 未配置";
   if (status === "empty") return "今天还没有练习";
   if (status === "error") return "数据库读取失败";
+  if (status === "mock") return `Mock · ${completion.done}/${completion.total} 个任务完成`;
   if (!pack) return "今日练习未就绪";
   return `${pack.date} · ${completion.done}/${completion.total} 个任务完成`;
 }
 
 function getPackColor() {
   return "teal";
+}
+
+function getLearningItemLabel(type) {
+  return {
+    keyword: "关键词",
+    phrase: "重点词组",
+    expression: "重点表达",
+    sentence_pattern: "重点句型",
+    listening_cue: "听力抓手",
+    missed_sound: "易漏听表达"
+  }[type] || "语言点";
+}
+
+function getLearningItemColor(type) {
+  return {
+    keyword: "teal",
+    phrase: "cyan",
+    expression: "blue",
+    sentence_pattern: "indigo",
+    listening_cue: "orange",
+    missed_sound: "red"
+  }[type] || "gray";
 }

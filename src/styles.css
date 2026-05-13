@@ -259,6 +259,19 @@ main {
   box-shadow: var(--shadow);
 }
 
+.daily-pack-skill-summary {
+  border-left: 5px solid var(--teal) !important;
+  background: linear-gradient(90deg, rgba(22, 114, 103, 0.08), rgba(255, 255, 255, 0) 48%), var(--surface);
+}
+
+.daily-pack-skill-summary h2 {
+  max-width: 760px;
+  margin: 0;
+  font-size: 34px;
+  line-height: 1.16;
+  overflow-wrap: anywhere;
+}
+
 .daily-pack-tabs .mantine-Tabs-tab {
   flex: 0 0 auto;
   min-width: 88px;
@@ -274,6 +287,56 @@ main {
 .daily-pack-material {
   min-width: 0;
   min-height: 100%;
+}
+
+.daily-pack-learning-item {
+  min-width: 0;
+}
+
+.daily-pack-learning-section {
+  margin-top: 14px;
+  border-top: 2px solid var(--line);
+  padding-top: 16px;
+}
+
+.daily-pack-subsection-title {
+  border-left: 4px solid var(--teal);
+  padding: 2px 0 2px 12px;
+}
+
+.daily-pack-learning-copy {
+  min-width: 0;
+}
+
+.daily-pack-learning-main {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.daily-pack-learning-main .mantine-Badge-root {
+  flex: 0 0 auto;
+}
+
+.daily-pack-learning-term {
+  margin: 0;
+  overflow-wrap: anywhere;
+  line-height: 1.25;
+}
+
+.daily-pack-learning-detail {
+  border-top: 1px solid var(--line);
+  padding-top: 10px;
+}
+
+.daily-pack-status-actions {
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  padding-bottom: 2px;
+}
+
+.daily-pack-status-actions button {
+  flex: 0 0 auto;
+  min-width: 56px;
 }
 
 .daily-pack-pre {
@@ -929,6 +992,11 @@ main {
     line-height: 1.14;
   }
 
+  .daily-pack-skill-summary h2 {
+    font-size: 25px;
+    line-height: 1.22;
+  }
+
   .daily-pack-hero .mantine-Group-root {
     align-items: flex-start;
   }
@@ -983,6 +1051,14 @@ main {
   .daily-pack-page .mantine-Badge-label {
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .daily-pack-learning-item .mantine-Group-root {
+    align-items: flex-start;
+  }
+
+  .daily-pack-learning-item > .mantine-Stack-root > .mantine-Group-root {
+    flex-wrap: wrap;
   }
 
   .page-title,
