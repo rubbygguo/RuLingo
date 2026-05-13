@@ -235,19 +235,6 @@ function ResponsiveShell({
       </Drawer>
 
       <main>{children}</main>
-
-      <nav className="mobile-bottom-nav" aria-label="移动端主导航">
-        {navItems.map((item) => (
-          <a
-            key={item.id}
-            href={item.href}
-            className={activeSection === item.id ? "active" : ""}
-            onClick={() => setActiveSection(item.id)}
-          >
-            <span>{item.shortLabel}</span>
-          </a>
-        ))}
-      </nav>
     </div>
   );
 }
@@ -741,12 +728,14 @@ function TaskCategory({ category, completedTasks, onToggleTask }) {
 
   return (
     <MantineCard component="article" className="task-category" withBorder radius="md" padding="md">
-      <Group justify="space-between" align="flex-start" gap="md" wrap="nowrap">
-        <div>
+      <Group justify="space-between" align="flex-start" gap="md" wrap="nowrap" className="task-category-head">
+        <div className="task-category-copy">
           <Title order={4} size="h4">{category.title}</Title>
           <Text c="dimmed" size="sm">{category.description}</Text>
         </div>
-        <Badge color="blue" variant="light">{completedCount}/{tasks.length}</Badge>
+        <Badge color="blue" variant="light" className="task-count-badge">
+          {completedCount}/{tasks.length}
+        </Badge>
       </Group>
       <MantineStack gap="sm" mt="md">
         {tasks.length === 0 && <Text c="dimmed" size="sm">这个分类下还没有固定任务。</Text>}

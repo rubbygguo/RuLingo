@@ -74,7 +74,8 @@ cp scripts/cos-deploy.local.example.json scripts/cos-deploy.local.json
   "endpoint": "cos.ap-guangzhou.myqcloud.com",
   "secretId": "你的 SecretId",
   "secretKey": "你的 SecretKey",
-  "token": ""
+  "token": "",
+  "cdnDomain": "www.example.com"
 }
 ```
 
@@ -87,6 +88,20 @@ npm run deploy:cos
 `scripts/cos-deploy.local.json` 已加入 `.gitignore`，不要提交这个文件。
 
 脚本会自动创建一个本地 `scripts/.coscli.local.yaml` 空配置文件，并把 Key、endpoint 通过命令参数传给 `coscli`，这样不会触发 `Input Your Secret ID` 这一类交互式初始化。
+
+如果配置了 `cdnDomain`，部署上传完成后，脚本会读取 `.umirc.js` 里的 Umi 路由，并把每个路由 URL 提交到腾讯云 CDN 刷新。也可以用环境变量临时指定：
+
+```bash
+CDN_DOMAIN=www.example.com npm run deploy:cos
+```
+
+多个域名可以使用逗号分隔：
+
+```bash
+CDN_DOMAINS=www.example.com,example.com npm run deploy:cos
+```
+
+默认刷新 `https` URL；如需刷新 `http`，可以设置 `CDN_PROTOCOL=http`。如果 CDN 使用独立密钥，可以设置 `CDN_SECRET_ID`、`CDN_SECRET_KEY`、`CDN_TOKEN`，否则会复用 COS 的 `secretId`、`secretKey`、`token`。
 
 如果要上传到 bucket 里的子目录：
 
