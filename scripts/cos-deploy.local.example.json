@@ -1,0 +1,9 @@
+{
+  "bucket": "",
+  "prefix": "",
+  "endpoint": "",
+  "secretId": "",
+  "secretKey": "",
+  "token": "",
+  "cdnDomain": ""
+}

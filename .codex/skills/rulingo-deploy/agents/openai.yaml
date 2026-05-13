@@ -1,0 +1,4 @@
+interface:
+  display_name: "RuLingo Deploy"
+  short_description: "Deploy RuLingo to Tencent COS and refresh CDN routes."
+  default_prompt: "Deploy the current RuLingo version using the repository deployment flow."

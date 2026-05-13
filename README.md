@@ -87,7 +87,7 @@ npm run deploy:cos
 
 `scripts/cos-deploy.local.json` 已加入 `.gitignore`，不要提交这个文件。
 
-脚本会自动创建一个本地 `scripts/.coscli.local.yaml` 空配置文件，并把 Key、endpoint 通过命令参数传给 `coscli`，这样不会触发 `Input Your Secret ID` 这一类交互式初始化。
+脚本会把 Key、endpoint 通过命令参数传给 `coscli`，这样不需要维护额外的 coscli 本地配置文件。
 
 如果配置了 `cdnDomain`，部署上传完成后，脚本会读取 `.umirc.js` 里的 Umi 路由，并把每个路由 URL 提交到腾讯云 CDN 刷新。也可以用环境变量临时指定：
 

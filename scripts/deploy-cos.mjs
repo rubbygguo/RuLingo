@@ -1,21 +1,22 @@
 #!/usr/bin/env node
 
 import { createHash, createHmac } from "node:crypto";
-import { cp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { cp, mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
-import { resolve } from "node:path";
+import { join, resolve } from "node:path";
 import { spawn } from "node:child_process";
 import { pathToFileURL } from "node:url";
+import { tmpdir } from "node:os";
 import https from "node:https";
 
 const rootDir = process.cwd();
 const localConfigPath = resolve(rootDir, "scripts/cos-deploy.local.json");
-const coscliConfigPath = resolve(rootDir, "scripts/.coscli.local.yaml");
 const umiConfigPath = resolve(rootDir, ".umirc.js");
 const distDir = resolve(rootDir, "dist");
 const dataDir = resolve(rootDir, "data");
 const distDataDir = resolve(distDir, "data");
 const args = new Set(process.argv.slice(2));
+const tempCoscliConfigDirs = [];
 
 const prepareOnly = args.has("--prepare-only") || args.has("--no-upload");
 const deleteRemote = args.has("--delete") || process.env.COS_DELETE === "1";
@@ -97,9 +98,8 @@ async function getCoscliGlobalArgs(config) {
   const secretKey = process.env.COS_SECRET_KEY || config.secretKey;
   const endpoint = process.env.COS_ENDPOINT || config.endpoint;
   const token = process.env.COS_TOKEN || config.token;
-  const configPath = process.env.COS_CONFIG_PATH || config.configPath || coscliConfigPath;
-
-  await ensureFile(configPath);
+  const tempConfigPath = await createTempCoscliConfig();
+  const configPath = process.env.COS_CONFIG_PATH || config.configPath || tempConfigPath;
 
   const globalArgs = ["--config-path", configPath];
   if (secretId) globalArgs.push("--secret-id", secretId);
@@ -108,6 +108,18 @@ async function getCoscliGlobalArgs(config) {
   if (token) globalArgs.push("--token", token);
 
   return globalArgs;
+}
+
+async function createTempCoscliConfig() {
+  const tempDir = await mkdtemp(join(tmpdir(), "rulingo-coscli-"));
+  const tempConfigPath = join(tempDir, "coscli.yaml");
+  await writeFile(tempConfigPath, "", "utf8");
+  tempCoscliConfigDirs.push(tempDir);
+  return tempConfigPath;
+}
+
+async function cleanupTempCoscliConfigs() {
+  await Promise.all(tempCoscliConfigDirs.map((tempDir) => rm(tempDir, { recursive: true, force: true })));
 }
 
 async function purgeCdnRoutes(config) {
@@ -302,11 +314,6 @@ function hmacHex(key, value) {
   return createHmac("sha256", key).update(value, "utf8").digest("hex");
 }
 
-async function ensureFile(path) {
-  if (existsSync(path)) return;
-  await writeFile(path, "", "utf8");
-}
-
 function trimTrailingSlash(value) {
   return value.replace(/\/+$/, "");
 }
@@ -356,7 +363,11 @@ function run(command, commandArgs) {
   });
 }
 
-main().catch((error) => {
-  console.error(error.message);
-  process.exit(1);
-});
+main()
+  .catch((error) => {
+    console.error(error.message);
+    process.exitCode = 1;
+  })
+  .finally(async () => {
+    await cleanupTempCoscliConfigs();
+  });
