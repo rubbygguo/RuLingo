@@ -74,27 +74,27 @@ export function DailyPackPage() {
     >
       {status === "error" && (
         <Alert color="red" variant="light" radius="md">
-          今日素材包读取失败：{loadError?.message || "请检查 CloudBase MySQL 配置和表结构。"}
+          今日练习读取失败：{loadError?.message || "请检查 CloudBase MySQL 配置和表结构。"}
         </Alert>
       )}
 
       {status === "not-configured" && (
         <EmptyDailyPackState
-          title="还没有连接素材包数据库"
-          message="页面不会读取本地 JSON。请先配置 CloudBase，并创建 daily pack snapshot 表，然后重新生成并上传今天的素材包。"
+          title="还没有连接今日练习数据库"
+          message="页面不会读取本地 JSON。请先配置 CloudBase，并创建 daily pack snapshot 表，然后重新生成并上传今天的练习。"
         />
       )}
 
       {status === "empty" && (
         <EmptyDailyPackState
-          title="今天还没有素材包"
-          message="数据库里没有找到今天的 daily_pack_snapshot。请先让 Codex 生成今天的素材包，并上传覆盖到 CloudBase。"
+          title="今天还没有练习"
+          message="数据库里没有找到今天的 daily_pack_snapshot。请先让 Codex 生成今天的练习，并上传覆盖到 CloudBase。"
         />
       )}
 
       {status === "loading" && (
         <Paper className="daily-pack-page" withBorder radius="md" p="lg">
-          <Text c="dimmed">正在从数据库读取今日素材包...</Text>
+          <Text c="dimmed">正在从数据库读取今日练习...</Text>
         </Paper>
       )}
 
@@ -509,11 +509,11 @@ function buildFeedbackText(pack, responses) {
 }
 
 function getStatusText(status, pack, completion) {
-  if (status === "loading") return "正在读取今日素材包...";
+  if (status === "loading") return "正在读取今日练习...";
   if (status === "not-configured") return "CloudBase 未配置";
-  if (status === "empty") return "今天还没有素材包";
+  if (status === "empty") return "今天还没有练习";
   if (status === "error") return "数据库读取失败";
-  if (!pack) return "今日素材包未就绪";
+  if (!pack) return "今日练习未就绪";
   return `${pack.date} · ${completion.done}/${completion.total} 个任务完成`;
 }
 

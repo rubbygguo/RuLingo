@@ -3,7 +3,7 @@ import { getCloudbaseClient } from "./progressStore.js";
 
 export async function loadDailyPackSnapshot(dateKey = "2026-05-13") {
   if (!isCloudbaseConfigured()) {
-    const error = new Error("CloudBase 未配置，无法读取数据库里的今日素材包。");
+    const error = new Error("CloudBase 未配置，无法读取数据库里的今日练习。");
     error.code = "cloudbase_not_configured";
     throw error;
   }
@@ -20,7 +20,7 @@ async function loadCloudbaseDailyPackSnapshot(dateKey) {
     .eq("date_key", dateKey)
     .limit(1);
 
-  if (error) throw new Error(error.message || "CloudBase MySQL 读取每日素材包失败");
+  if (error) throw new Error(error.message || "CloudBase MySQL 读取今日练习失败");
   const row = Array.isArray(data) ? data[0] : null;
   if (!row) return null;
 

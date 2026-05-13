@@ -10,7 +10,10 @@ export default defineConfig({
   jsMinifierOptions: {
     target: ["chrome80", "es2020"]
   },
-  title: "英文提升学习系统",
+  title: "RuLingo",
+  links: [
+    { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }
+  ],
   plugins: ["./plugins/localDataServer.js"],
   routes: [
     {
