@@ -40,12 +40,13 @@ const result = await auth.signInWithPassword({
 });
 if (result?.error) throw new Error(result.error.message || "CloudBase username/password sign-in failed.");
 const loginState = await auth.getLoginState();
-const ownerId = getUserId(loginState?.user) || config.username;
+const ownerId = config.owner || getUserId(loginState?.user) || config.username;
 
 const db = app.mysql();
 const tableName = config.tableName || "rulingo_daily_pack_snapshots";
 const now = getMySQLDateTime();
 const row = {
+  owner: ownerId,
   date_key: dateKey,
   schema_version: snapshot.schemaVersion || "daily_pack_snapshot.v1",
   pack_json: JSON.stringify(pack),
@@ -58,7 +59,7 @@ const { error } = await db.from(tableName).upsert(row, {
 });
 
 if (error) {
-  if (isEmptyJsonResponseError(error) && await hasUploadedSnapshot(db, tableName, dateKey)) {
+  if (isEmptyJsonResponseError(error) && await hasUploadedSnapshot(db, tableName, ownerId, dateKey)) {
     console.log(`Daily pack snapshot overridden: ${dateKey} -> ${tableName} (verified after empty response).`);
     process.exit(0);
   }
@@ -78,6 +79,7 @@ async function loadConfig() {
     region: process.env.CLOUDBASE_REGION || process.env.UMI_APP_CLOUDBASE_REGION || local.region || "ap-shanghai",
     accessKey: process.env.CLOUDBASE_ACCESS_KEY || process.env.UMI_APP_CLOUDBASE_ACCESS_KEY || local.accessKey || "",
     tableName: process.env.CLOUDBASE_DAILY_PACK_TABLE || local.tableName || "rulingo_daily_pack_snapshots",
+    owner: process.env.CLOUDBASE_DAILY_PACK_OWNER || local.owner || "",
     username: process.env.CLOUDBASE_USERNAME || local.username || "",
     password: process.env.CLOUDBASE_PASSWORD || local.password || ""
   };
@@ -105,10 +107,11 @@ function parseArgs(values) {
   }, {});
 }
 
-async function hasUploadedSnapshot(db, tableName, dateKey) {
+async function hasUploadedSnapshot(db, tableName, ownerId, dateKey) {
   const { data, error } = await db
     .from(tableName)
     .select("date_key")
+    .eq("owner", ownerId)
     .eq("date_key", dateKey)
     .limit(1);
 
