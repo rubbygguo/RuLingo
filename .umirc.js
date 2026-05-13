@@ -12,7 +12,8 @@ export default defineConfig({
   },
   title: "RuLingo",
   links: [
-    { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }
+    { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
+    { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" }
   ],
   plugins: ["./plugins/localDataServer.js"],
   routes: [
