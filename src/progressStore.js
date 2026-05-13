@@ -136,7 +136,7 @@ export async function signOutProgressUser() {
   cloudbaseClientPromise = null;
 }
 
-async function getCloudbaseClient() {
+export async function getCloudbaseClient() {
   if (!cloudbaseClientPromise) {
     cloudbaseClientPromise = initCloudbaseClient();
   }
@@ -456,7 +456,7 @@ function normalizeDateKey(value) {
   return String(value || "").slice(0, 10);
 }
 
-function getMySQLDateTime() {
+export function getMySQLDateTime() {
   const now = new Date();
   const year = now.getFullYear();
   const month = String(now.getMonth() + 1).padStart(2, "0");

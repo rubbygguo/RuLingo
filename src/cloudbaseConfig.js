@@ -5,6 +5,7 @@ export const cloudbaseConfig = {
   region: env.UMI_APP_CLOUDBASE_REGION || "ap-shanghai",
   accessKey: env.UMI_APP_CLOUDBASE_ACCESS_KEY || "",
   tableName: "rulingo_daily_task_completions",
+  dailyPackTableName: "rulingo_daily_pack_snapshots",
   authMode: env.UMI_APP_CLOUDBASE_AUTH_MODE || "anonymous"
 };
 

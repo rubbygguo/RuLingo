@@ -22,6 +22,10 @@ export default defineConfig({
       component: "./today"
     },
     {
+      path: "/daily-pack",
+      component: "./daily-pack"
+    },
+    {
       path: "/login",
       component: "./login"
     }

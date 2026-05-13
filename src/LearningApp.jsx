@@ -176,7 +176,7 @@ export function TodayPlanPage() {
   );
 }
 
-function ResponsiveShell({
+export function ResponsiveShell({
   children,
   query,
   setQuery,
@@ -303,6 +303,7 @@ function SidebarContent({
 function getNavItems() {
   const navItems = [
     ["today", "今日计划", "今日", `${getBasePath()}today`],
+    ["daily-pack", "今日素材包", "素材包", `${getBasePath()}daily-pack`],
     ["materials", "素材库", "素材", `${getBasePath()}#materials`],
     ["expressions", "表达库", "表达", `${getBasePath()}#expressions`],
     ["practices", "练习库", "练习", `${getBasePath()}#practices`],

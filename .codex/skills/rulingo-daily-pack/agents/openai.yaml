@@ -1,0 +1,4 @@
+interface:
+  display_name: "Generate RuLingo Daily Pack"
+  short_description: "Generate and upload a RuLingo daily learning pack"
+  default_prompt: "帮我生成今天的 RuLingo 素材包"

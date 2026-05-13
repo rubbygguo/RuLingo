@@ -17,6 +17,7 @@ src/.umi-production/
 .env.*
 !.env.example
 scripts/cos-deploy.local.json
+scripts/cloudbase-daily-pack.local.json
 
 # Logs & debug
 *.log
@@ -44,3 +45,4 @@ coverage/
 
 # Locally generated learning material packs
 materials-system/daily-packs/
+data/daily-packs/
