@@ -1,7 +1,7 @@
 import { cloudbaseConfig, isCloudbaseConfigured } from "./cloudbaseConfig.js";
 import { getCloudbaseClient } from "./progressStore.js";
 
-export async function loadDailyPackSnapshot(dateKey = "2026-05-13") {
+export async function loadDailyPackSnapshot(dateKey) {
   if (!isCloudbaseConfigured()) {
     const error = new Error("CloudBase 未配置，无法读取数据库里的今日练习。");
     error.code = "cloudbase_not_configured";

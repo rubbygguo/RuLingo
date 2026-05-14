@@ -23,11 +23,12 @@ import { ResponsiveShell } from "./LearningApp.jsx";
 import { mockDailyPackSnapshot } from "./mockDailyPackData.js";
 
 const useMockDailyPack = false;
-const responseStoreKey = useMockDailyPack
-  ? `rulingo:daily-pack:${mockDailyPackSnapshot.date}:mock:responses`
-  : "rulingo:daily-pack:2026-05-13:responses";
 
 export function DailyPackPage() {
+  const todayKey = getTodayDateKey();
+  const responseStoreKey = useMockDailyPack
+    ? `rulingo:daily-pack:${mockDailyPackSnapshot.date}:mock:responses`
+    : `rulingo:daily-pack:${todayKey}:responses`;
   const [snapshot, setSnapshot] = useState(null);
   const [status, setStatus] = useState("loading");
   const [loadError, setLoadError] = useState(null);
@@ -42,7 +43,7 @@ export function DailyPackPage() {
 
     let ignore = false;
 
-    loadDailyPackSnapshot("2026-05-13")
+    loadDailyPackSnapshot(todayKey)
       .then((result) => {
         if (ignore) return;
         setSnapshot(result);
@@ -59,7 +60,7 @@ export function DailyPackPage() {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [todayKey]);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(responseStoreKey);
@@ -118,6 +119,14 @@ export function DailyPackPage() {
       )}
     </ResponsiveShell>
   );
+}
+
+function getTodayDateKey() {
+  const today = new Date();
+  const year = today.getFullYear();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+  const day = String(today.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function EmptyDailyPackState({ title, message }) {
