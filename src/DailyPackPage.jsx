@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Accordion,
   Alert,
@@ -18,7 +18,7 @@ import {
   Textarea,
   Title
 } from "@mantine/core";
-import { loadDailyPackSnapshot } from "./dailyPackClient.js";
+import { loadDailyPackResponses, loadDailyPackSnapshot, saveDailyPackResponses } from "./dailyPackClient.js";
 import { ResponsiveShell } from "./LearningApp.jsx";
 import { mockDailyPackSnapshot } from "./mockDailyPackData.js";
 
@@ -26,28 +26,60 @@ const useMockDailyPack = false;
 
 export function DailyPackPage() {
   const todayKey = getTodayDateKey();
-  const responseStoreKey = useMockDailyPack
-    ? `rulingo:daily-pack:${mockDailyPackSnapshot.date}:mock:responses`
-    : `rulingo:daily-pack:${todayKey}:responses`;
+  const responseDateKey = useMockDailyPack ? mockDailyPackSnapshot.date : todayKey;
   const [snapshot, setSnapshot] = useState(null);
   const [status, setStatus] = useState("loading");
   const [loadError, setLoadError] = useState(null);
   const [responses, setResponses] = useState({});
+  const [responsesLoaded, setResponsesLoaded] = useState(false);
+  const [responsesDirty, setResponsesDirty] = useState(false);
+  const [saveStatus, setSaveStatus] = useState("idle");
+  const [saveError, setSaveError] = useState(null);
 
   useEffect(() => {
+    setResponsesLoaded(false);
+    setResponsesDirty(false);
+    setSaveStatus("idle");
+    setSaveError(null);
+
     if (useMockDailyPack) {
       setSnapshot(mockDailyPackSnapshot);
       setStatus("mock");
+      loadDailyPackResponses(responseDateKey)
+        .then((result) => {
+          setResponses(result.responses || {});
+          setSaveStatus(result.updatedAt ? "saved" : "idle");
+        })
+        .catch((error) => {
+          console.error(error);
+          setResponses({});
+        })
+        .finally(() => setResponsesLoaded(true));
       return undefined;
     }
 
     let ignore = false;
 
     loadDailyPackSnapshot(todayKey)
-      .then((result) => {
+      .then(async (result) => {
         if (ignore) return;
         setSnapshot(result);
         setStatus(result ? "ready" : "empty");
+
+        try {
+          const savedResponses = await loadDailyPackResponses(todayKey);
+          if (ignore) return;
+          setResponses(savedResponses.responses || {});
+          setSaveStatus(savedResponses.updatedAt ? "saved" : "idle");
+        } catch (responseError) {
+          console.error(responseError);
+          if (!ignore) {
+            setSaveError(responseError);
+            setSaveStatus("error");
+          }
+        } finally {
+          if (!ignore) setResponsesLoaded(true);
+        }
       })
       .catch((error) => {
         console.error(error);
@@ -60,16 +92,35 @@ export function DailyPackPage() {
     return () => {
       ignore = true;
     };
-  }, [todayKey]);
+  }, [responseDateKey, todayKey]);
 
-  useEffect(() => {
-    const saved = window.localStorage.getItem(responseStoreKey);
-    if (saved) setResponses(JSON.parse(saved));
+  const updateResponses = useCallback((updater) => {
+    setResponsesDirty(true);
+    setResponses((current) => (typeof updater === "function" ? updater(current) : updater));
   }, []);
 
   useEffect(() => {
-    window.localStorage.setItem(responseStoreKey, JSON.stringify(responses));
-  }, [responses]);
+    const pack = snapshot?.packJson;
+    if (!responsesLoaded || !responsesDirty || !pack) return undefined;
+
+    setSaveStatus("saving");
+    setSaveError(null);
+    const timer = window.setTimeout(() => {
+      saveDailyPackResponses({
+        dateKey: responseDateKey,
+        packId: pack.id,
+        responses
+      })
+        .then(() => setSaveStatus("saved"))
+        .catch((error) => {
+          console.error(error);
+          setSaveError(error);
+          setSaveStatus("error");
+        });
+    }, 500);
+
+    return () => window.clearTimeout(timer);
+  }, [responseDateKey, responses, responsesDirty, responsesLoaded, snapshot]);
 
   const pack = snapshot?.packJson;
   const completion = useMemo(() => getCompletion(pack, responses), [pack, responses]);
@@ -114,7 +165,9 @@ export function DailyPackPage() {
           pack={pack}
           completion={completion}
           responses={responses}
-          setResponses={setResponses}
+          setResponses={updateResponses}
+          saveStatus={saveStatus}
+          saveError={saveError}
         />
       )}
     </ResponsiveShell>
@@ -143,7 +196,7 @@ function EmptyDailyPackState({ title, message }) {
   );
 }
 
-function DailyPackWorkbench({ pack, completion, responses, setResponses }) {
+function DailyPackWorkbench({ pack, completion, responses, setResponses, saveStatus, saveError }) {
   const firstSection = pack.sections?.[0]?.id || "listening";
 
   return (
@@ -162,16 +215,35 @@ function DailyPackWorkbench({ pack, completion, responses, setResponses }) {
             <Text c="dimmed" mt="sm" maw={820}>
               {pack.summary}
             </Text>
+            <Group gap="xs" mt="md" className="daily-pack-save-status">
+              <Text size="sm" fw={850}>
+                记录状态
+              </Text>
+              <Badge color={getSaveStatusColor(saveStatus)} variant="light" size="lg">
+                {getSaveStatusText(saveStatus)}
+              </Badge>
+              <Text size="sm" c="dimmed">
+                勾选和回答会自动保存
+              </Text>
+            </Group>
           </div>
           <Stack gap="xs" className="daily-pack-progress">
             <Badge color="teal" variant="light" size="lg">
               {pack.estimatedMinutes} min
+            </Badge>
+            <Badge color={getSaveStatusColor(saveStatus)} variant="light" size="lg">
+              {getSaveStatusText(saveStatus)}
             </Badge>
             <Text size="sm" fw={700}>
               {completion.done} / {completion.total} tasks
             </Text>
           </Stack>
         </Group>
+        {saveStatus === "error" && (
+          <Alert color="red" variant="light" radius="md" mt="md">
+            作答记录保存失败：{saveError?.message || "请检查 CloudBase MySQL 响应记录表。"}
+          </Alert>
+        )}
       </Paper>
 
       <Tabs defaultValue={firstSection} keepMounted={false} className="daily-pack-tabs">
@@ -332,7 +404,8 @@ function LearningItemCard({ item, responses, setResponses }) {
         ...(current.learningItems || {}),
         [item.id]: {
           ...(current.learningItems?.[item.id] || {}),
-          ...next
+          ...next,
+          updatedAt: new Date().toISOString()
         }
       }
     }));
@@ -431,7 +504,8 @@ function UnitFeedback({ unit, responses, setResponses }) {
         ...(current.unitFeedback || {}),
         [unit.id]: {
           ...(current.unitFeedback?.[unit.id] || {}),
-          ...next
+          ...next,
+          updatedAt: new Date().toISOString()
         }
       }
     }));
@@ -529,7 +603,8 @@ function TaskCard({ task, responses, setResponses }) {
         ...(current.tasks || {}),
         [task.id]: {
           ...(current.tasks?.[task.id] || {}),
-          ...next
+          ...next,
+          updatedAt: new Date().toISOString()
         }
       }
     }));
@@ -671,6 +746,24 @@ function getStatusText(status, pack, completion) {
   if (status === "mock") return `Mock · ${completion.done}/${completion.total} 个任务完成`;
   if (!pack) return "今日练习未就绪";
   return `${pack.date} · ${completion.done}/${completion.total} 个任务完成`;
+}
+
+function getSaveStatusText(saveStatus) {
+  return {
+    idle: "未记录",
+    saving: "保存中",
+    saved: "已记录",
+    error: "记录失败"
+  }[saveStatus] || "未记录";
+}
+
+function getSaveStatusColor(saveStatus) {
+  return {
+    idle: "gray",
+    saving: "blue",
+    saved: "teal",
+    error: "red"
+  }[saveStatus] || "gray";
 }
 
 function getPackColor() {

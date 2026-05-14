@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { createHash, createHmac } from "node:crypto";
-import { cp, mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { mkdtemp, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
 import { existsSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { spawn } from "node:child_process";
@@ -13,8 +13,6 @@ const rootDir = process.cwd();
 const localConfigPath = resolve(rootDir, "scripts/cos-deploy.local.json");
 const umiConfigPath = resolve(rootDir, ".umirc.js");
 const distDir = resolve(rootDir, "dist");
-const dataDir = resolve(rootDir, "data");
-const distDataDir = resolve(distDir, "data");
 const args = new Set(process.argv.slice(2));
 const tempCoscliConfigDirs = [];
 
@@ -29,12 +27,6 @@ async function main() {
 
   await assertDirectory(distDir, "dist");
   await writeLegacyAssetAliases();
-
-  if (existsSync(dataDir)) {
-    console.log("Copying data/ into dist/data...");
-    await rm(distDataDir, { recursive: true, force: true });
-    await cp(dataDir, distDataDir, { recursive: true });
-  }
 
   const target = getCosTarget(config);
   if (prepareOnly || !target) {

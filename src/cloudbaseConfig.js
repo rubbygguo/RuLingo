@@ -6,6 +6,9 @@ export const cloudbaseConfig = {
   accessKey: env.UMI_APP_CLOUDBASE_ACCESS_KEY || "",
   tableName: "rulingo_daily_task_completions",
   dailyPackTableName: "rulingo_daily_pack_snapshots",
+  dailyPackResponseTableName: "rulingo_daily_pack_responses",
+  memoryItemsTableName: "rulingo_memory_items",
+  memoryItemTagsTableName: "rulingo_memory_item_tags",
   authMode: env.UMI_APP_CLOUDBASE_AUTH_MODE || "anonymous"
 };
 

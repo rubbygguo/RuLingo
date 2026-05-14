@@ -18,7 +18,6 @@ import {
   Title
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { loadLearningData } from "./dataClient.js";
 import {
   getProgressStoreName,
   loadDayCompletions,
@@ -26,152 +25,23 @@ import {
   saveTaskCompletion,
   signOutProgressUser
 } from "./progressStore.js";
-
-const emptyData = {
-  settings: null,
-  taxonomy: null,
-  routines: [],
-  weekly: [],
-  milestones: [],
-  dailyPlan: null,
-  materials: [],
-  expressions: [],
-  practices: [],
-  writings: [],
-  writingGuidance: null,
-  checkinTemplates: []
-};
+import { todayPlan } from "./todayPlanData.js";
 
 export default function LearningApp() {
-  const [data, setData] = useState(emptyData);
-  const [status, setStatus] = useState("loading");
-  const [query, setQuery] = useState("");
-  const [selectedTag, setSelectedTag] = useState("all");
-  const [selectedPracticeDuration, setSelectedPracticeDuration] = useState("all");
-  const [activeSection, setActiveSection] = useState("materials");
-
-  useEffect(() => {
-    let ignore = false;
-
-    loadLearningData()
-      .then((result) => {
-        if (ignore) return;
-        setData(result);
-        setStatus("ready");
-      })
-      .catch((error) => {
-        console.error(error);
-        if (!ignore) setStatus("error");
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
-  const searchText = query.trim().toLowerCase();
-  const materialTags = useMemo(
-    () => Array.from(new Set(data.materials.flatMap((material) => material.tags))).slice(0, 10),
-    [data.materials]
-  );
-  const practiceDurations = useMemo(
-    () => ["all", ...Array.from(new Set(data.practices.map((practice) => practice.duration)))],
-    [data.practices]
-  );
-  const filteredMaterials = data.materials.filter(
-    (material) => matchesQuery(material, searchText) && matchesTag(material, selectedTag)
-  );
-  const filteredExpressions = data.expressions.filter(
-    (expression) => matchesQuery(expression, searchText) && matchesTag(expression, selectedTag)
-  );
-  const filteredPractices = data.practices.filter(
-    (practice) =>
-      matchesQuery(practice, searchText) &&
-      (selectedPracticeDuration === "all" || practice.duration === selectedPracticeDuration)
-  );
-  const hasSearchResults =
-    filteredMaterials.length + filteredExpressions.length + filteredPractices.length > 0;
-
-  return (
-    <ResponsiveShell
-      query={query}
-      setQuery={setQuery}
-      activeSection={activeSection}
-      setActiveSection={setActiveSection}
-      statusText={getStatusText(status, data)}
-    >
-        {status === "error" && (
-          <div className="empty-state">
-            数据读取失败。请运行开发服务器后访问 <strong>http://localhost:4173/</strong>。
-          </div>
-        )}
-
-        {status !== "error" && (
-          <>
-            <MaterialsSection
-              materials={filteredMaterials}
-              expressions={data.expressions}
-              tags={materialTags}
-              selectedTag={selectedTag}
-              setSelectedTag={setSelectedTag}
-            />
-            <ExpressionsSection expressions={filteredExpressions} materials={data.materials} />
-            <PracticesSection
-              practices={filteredPractices}
-              durations={practiceDurations}
-              selectedPracticeDuration={selectedPracticeDuration}
-              setSelectedPracticeDuration={setSelectedPracticeDuration}
-            />
-            <WritingSection writings={data.writings} writingGuidance={data.writingGuidance} />
-            <ReviewSection checkinTemplates={data.checkinTemplates} milestones={data.milestones} />
-            {searchText && !hasSearchResults && (
-              <div className="empty-state">没有找到匹配内容，换一个关键词或标签试试。</div>
-            )}
-          </>
-        )}
-    </ResponsiveShell>
-  );
+  return <TodayPlanPage />;
 }
 
 export function TodayPlanPage() {
-  const [data, setData] = useState(emptyData);
-  const [status, setStatus] = useState("loading");
-
-  useEffect(() => {
-    let ignore = false;
-
-    loadLearningData()
-      .then((result) => {
-        if (ignore) return;
-        setData(result);
-        setStatus("ready");
-      })
-      .catch((error) => {
-        console.error(error);
-        if (!ignore) setStatus("error");
-      });
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
   return (
     <ResponsiveShell
       query=""
       setQuery={() => {}}
       activeSection="today"
       setActiveSection={() => {}}
-      statusText={getStatusText(status, data)}
+      statusText={`今日计划 · 完成记录：${getProgressStoreName()}`}
       searchDisabled
     >
-        {status === "error" && (
-          <div className="empty-state">
-            数据读取失败。请运行开发服务器后访问 <strong>http://localhost:4173/today</strong>。
-          </div>
-        )}
-
-        {status !== "error" && <TodayWorkbench data={data} />}
+      <TodayWorkbench dailyPlan={todayPlan} />
     </ResponsiveShell>
   );
 }
@@ -304,18 +174,13 @@ function getNavItems() {
   const navItems = [
     ["today", "今日计划", "今日", `${getBasePath()}today`],
     ["daily-pack", "今日练习", "练习", `${getBasePath()}daily-pack`],
-    ["materials", "素材库", "素材", `${getBasePath()}#materials`],
-    ["expressions", "表达库", "表达", `${getBasePath()}#expressions`],
-    ["practices", "练习库", "练习", `${getBasePath()}#practices`],
-    ["writing", "写作", "写作", `${getBasePath()}#writing`],
-    ["review", "复盘", "复盘", `${getBasePath()}#review`]
+    ["memory", "语言记忆库", "记忆", `${getBasePath()}memory`]
   ];
 
   return navItems.map(([id, label, shortLabel, href]) => ({ id, label, shortLabel, href }));
 }
 
-export function TodayWorkbench({ data }) {
-  const { dailyPlan } = data;
+export function TodayWorkbench({ dailyPlan }) {
   const todayKey = getTodayDateKey();
   const [selectedDate, setSelectedDate] = useState(todayKey);
   const [rangeStart, setRangeStart] = useState(() => getStartOfWeekKey(todayKey));
@@ -550,179 +415,6 @@ export function TodayWorkbench({ data }) {
   );
 }
 
-function MaterialsSection({ materials, expressions, tags, selectedTag, setSelectedTag }) {
-  return (
-    <section id="materials" className="content-section">
-      <div className="section-title">
-        <div>
-          <p className="eyebrow">Input</p>
-          <h2>素材库</h2>
-        </div>
-        <div className="filters" aria-label="标签筛选">
-          {["all", ...tags].map((tag) => (
-            <button
-              key={tag}
-              type="button"
-              className={tag === selectedTag ? "active" : ""}
-              onClick={() => setSelectedTag(tag)}
-            >
-              {tag === "all" ? "全部" : tag}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="list-grid">
-        {materials.map((material) => (
-          <MaterialCard key={material.id} material={material} expressions={expressions} />
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function MaterialCard({ material, expressions }) {
-  const related = expressions.filter((expression) => material.expressionIds.includes(expression.id));
-
-  return (
-    <article className="card">
-      <div className="panel-head">
-        <div>
-          <p className="eyebrow">{material.date} · {material.type}</p>
-          <h3>{material.title}</h3>
-        </div>
-        <span className="source-pill">{material.durationMinutes} min</span>
-      </div>
-      <div className="meta-row">{material.tags.map((tag) => <Tag key={tag}>{tag}</Tag>)}</div>
-      <div className="card-body markdown" dangerouslySetInnerHTML={{ __html: markdownToHTML(material.content) }} />
-      <div className="prompt"><strong>Speaking</strong><br />{material.tasks.speaking}</div>
-      <div className="prompt"><strong>Writing</strong><br />{material.tasks.writing}</div>
-      <div className="meta-row">
-        {related.slice(0, 6).map((expression) => <Tag key={expression.id}>{expression.text}</Tag>)}
-      </div>
-    </article>
-  );
-}
-
-function ExpressionsSection({ expressions, materials }) {
-  return (
-    <section id="expressions" className="content-section">
-      <div className="section-title">
-        <div>
-          <p className="eyebrow">Reuse</p>
-          <h2>表达库</h2>
-        </div>
-        <span className="count">{expressions.length} items</span>
-      </div>
-      <div className="expression-grid">
-        {expressions.map((expression) => {
-          const material = materials.find((item) => item.id === expression.sourceMaterialId);
-          return (
-            <article key={expression.id} className="expression-card">
-              <p className="eyebrow">{expression.category || "Expression"}</p>
-              <h3>{expression.text}</h3>
-              <p>{expression.meaning}</p>
-              <div className="prompt">{expression.example || "Add your own example."}</div>
-              <div className="meta-row">
-                {expression.tags.slice(0, 3).map((tag) => <Tag key={tag}>{tag}</Tag>)}
-                {material && <span className="source-pill">{material.title}</span>}
-              </div>
-            </article>
-          );
-        })}
-      </div>
-    </section>
-  );
-}
-
-function PracticesSection({ practices, durations, selectedPracticeDuration, setSelectedPracticeDuration }) {
-  return (
-    <section id="practices" className="content-section">
-      <div className="section-title">
-        <div>
-          <p className="eyebrow">Output</p>
-          <h2>口语和课程练习</h2>
-        </div>
-        <div className="segmented">
-          {durations.map((duration) => (
-            <button
-              key={duration}
-              type="button"
-              className={duration === selectedPracticeDuration ? "active" : ""}
-              onClick={() => setSelectedPracticeDuration(duration)}
-            >
-              {duration === "all" ? "全部" : duration}
-            </button>
-          ))}
-        </div>
-      </div>
-      <div className="list-grid compact">
-        {practices.map((practice) => (
-          <article key={practice.id} className="card">
-            <p className="eyebrow">{practice.duration} · {practice.type}</p>
-            <h3>{practice.title}</h3>
-            <div className="prompt">{practice.prompt}</div>
-            <ul className="frame-list">
-              {practice.frames.map((frame) => <li key={frame}>{frame}</li>)}
-            </ul>
-            <div className="meta-row">{practice.tags.slice(0, 4).map((tag) => <Tag key={tag}>{tag}</Tag>)}</div>
-          </article>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function WritingSection({ writings, writingGuidance }) {
-  return (
-    <section id="writing" className="content-section two-column">
-      <div>
-        <p className="eyebrow">Writing</p>
-        <h2>写作练习</h2>
-        <div className="stack">
-          {writings.map((writing) => <Mini key={writing.id} title={writing.title}>{writing.prompt}</Mini>)}
-        </div>
-      </div>
-      <div className="panel">
-        <p className="eyebrow">Revision</p>
-        <h3>三层修改</h3>
-        <div className="stack">
-          {(writingGuidance?.revisionLayers || []).map((layer) => (
-            <Mini key={layer.name} title={layer.name}>{layer.description}</Mini>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ReviewSection({ checkinTemplates, milestones }) {
-  return (
-    <section id="review" className="content-section two-column">
-      <div>
-        <p className="eyebrow">Check-in</p>
-        <h2>复盘模板</h2>
-        <div className="stack">
-          {checkinTemplates.map((template) => (
-            <Mini key={template.id} title={template.title}>{template.fields.join(" / ")}</Mini>
-          ))}
-        </div>
-      </div>
-      <div className="panel">
-        <p className="eyebrow">Growth</p>
-        <h3>30 天阶段目标</h3>
-        <div className="stack">
-          {milestones.map((milestone) => (
-            <Mini key={milestone.week} title={`第 ${milestone.week} 周：${milestone.title}`}>
-              {milestone.goal}
-            </Mini>
-          ))}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function TaskCategory({ category, completedTasks, onToggleTask }) {
   const tasks = category.tasks || [];
   const completedCount = tasks.filter((task) => completedTasks[getTaskKey(category.id, task.id)]).length;
@@ -771,10 +463,6 @@ function Mini({ title, children }) {
       <p>{children}</p>
     </article>
   );
-}
-
-function Tag({ children }) {
-  return <span className="tag">{children}</span>;
 }
 
 function getTaskKey(categoryId, taskId) {
@@ -893,37 +581,8 @@ function dateToKey(date) {
   return `${year}-${month}-${day}`;
 }
 
-function getStatusText(status, data) {
-  if (status === "loading") return "正在读取本地数据...";
-  if (status === "error") return "本地数据读取失败";
-  return `已读取 ${data.materials.length} 份素材、${data.expressions.length} 个表达、${data.practices.length} 个练习`;
-}
-
 function getBasePath() {
   return "/";
-}
-
-function matchesTag(item, selectedTag) {
-  return selectedTag === "all" || item.tags?.includes(selectedTag);
-}
-
-function matchesQuery(item, query) {
-  if (!query) return true;
-  return JSON.stringify(item).toLowerCase().includes(query);
-}
-
-function markdownToHTML(markdown) {
-  return markdown
-    .split(/\n{2,}/)
-    .map((block) => {
-      const text = block.trim();
-      if (!text) return "";
-      if (text.startsWith("# ")) return `<h1>${escapeHTML(text.slice(2))}</h1>`;
-      if (text.startsWith("## ")) return `<h2>${escapeHTML(text.slice(3))}</h2>`;
-      if (text.startsWith("### ")) return `<h3>${escapeHTML(text.slice(4))}</h3>`;
-      return `<p>${escapeHTML(text).replace(/\n/g, "<br>")}</p>`;
-    })
-    .join("");
 }
 
 function formatDate(dateText) {
@@ -935,13 +594,4 @@ function formatDate(dateText) {
     day: "numeric",
     weekday: "short"
   });
-}
-
-function escapeHTML(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
 }

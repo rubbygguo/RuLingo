@@ -244,6 +244,14 @@ main {
   align-items: flex-end;
 }
 
+.daily-pack-save-status {
+  min-width: 0;
+}
+
+.daily-pack-save-status .mantine-Badge-root {
+  flex: 0 0 auto;
+}
+
 .daily-pack-tabs {
   min-width: 0;
   margin-top: 18px;
@@ -350,6 +358,167 @@ main {
   font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
   font-size: 14px;
   line-height: 1.6;
+}
+
+.memory-page {
+  width: 100%;
+  min-width: 0;
+  max-width: 1220px;
+  margin: 0 auto 28px;
+  overflow-x: hidden;
+}
+
+.memory-hero h1 {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 48px);
+  line-height: 1.1;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.memory-hero-copy {
+  min-width: 0;
+  flex: 1 1 480px;
+}
+
+.memory-stat-grid {
+  width: min(360px, 100%);
+  flex: 0 0 auto;
+}
+
+.memory-stat {
+  min-height: 82px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--surface-soft);
+}
+
+.memory-stat strong,
+.memory-stat span {
+  display: block;
+}
+
+.memory-stat strong {
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.memory-stat span {
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.memory-toolbar {
+  margin-top: 16px;
+}
+
+.memory-toolbar-row {
+  min-width: 0;
+}
+
+.memory-toolbar-row > button {
+  flex: 0 0 auto;
+}
+
+.memory-inline-search {
+  flex: 0 1 320px;
+  min-width: 180px;
+}
+
+.memory-inline-search input {
+  min-height: 30px;
+}
+
+.memory-tag-modal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.memory-tag-modal-grid button {
+  min-height: 40px;
+}
+
+.memory-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(360px, 1.05fr);
+  gap: 16px;
+  margin-top: 16px;
+  align-items: start;
+}
+
+.memory-list,
+.memory-list-entry,
+.memory-side-detail,
+.memory-detail {
+  min-width: 0;
+}
+
+.memory-inline-detail {
+  display: none;
+}
+
+.memory-item-card {
+  width: 100%;
+  min-height: 118px;
+  color: var(--ink);
+  background: var(--surface);
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 8px 24px rgba(24, 33, 43, 0.06);
+}
+
+.memory-item-card.is-selected,
+.memory-item-card:hover,
+.memory-item-card:focus-visible {
+  border-color: rgba(22, 114, 103, 0.65);
+  outline: none;
+}
+
+.memory-item-copy {
+  min-width: 0;
+}
+
+.memory-item-copy h3 {
+  margin: 0 0 4px;
+  font-size: 20px;
+  line-height: 1.22;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.memory-next-review {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
+.memory-detail {
+  position: sticky;
+  top: 30px;
+}
+
+.memory-detail-title {
+  min-width: 0;
+}
+
+.memory-detail h2 {
+  margin: 0;
+  font-size: 30px;
+  line-height: 1.15;
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.memory-detail-line {
+  border-left: 3px solid var(--line);
+  padding-left: 10px;
+}
+
+.memory-empty {
+  color: var(--muted);
 }
 
 .page-title,
@@ -923,6 +1092,10 @@ main {
     grid-template-columns: 1fr;
   }
 
+  .memory-layout {
+    grid-template-columns: minmax(0, 0.92fr) minmax(320px, 1.08fr);
+  }
+
   .app-shell > main {
     width: 100%;
     min-width: 0;
@@ -983,13 +1156,42 @@ main {
     max-width: 100%;
   }
 
+  .memory-page {
+    max-width: 100%;
+  }
+
   .daily-pack-hero {
+    padding: 20px 16px !important;
+  }
+
+  .memory-hero {
     padding: 20px 16px !important;
   }
 
   .daily-pack-hero h1 {
     font-size: 30px;
     line-height: 1.14;
+  }
+
+  .memory-hero h1 {
+    font-size: 30px;
+    line-height: 1.14;
+  }
+
+  .memory-hero .mantine-Group-root {
+    align-items: flex-start;
+  }
+
+  .memory-stat-grid {
+    width: 100%;
+  }
+
+  .memory-toolbar-row {
+    align-items: stretch;
+  }
+
+  .memory-inline-search {
+    flex: 1 1 180px;
   }
 
   .daily-pack-skill-summary h2 {
@@ -1051,6 +1253,49 @@ main {
   .daily-pack-page .mantine-Badge-label {
     overflow: hidden;
     text-overflow: ellipsis;
+  }
+
+  .memory-page .mantine-Paper-root,
+  .memory-page .mantine-Card-root,
+  .memory-page .mantine-TextInput-root {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .memory-page .mantine-Text-root,
+  .memory-page .mantine-Title-root,
+  .memory-page .mantine-Badge-label {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .memory-item-card {
+    min-height: 112px;
+  }
+
+  .memory-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .memory-side-detail {
+    display: none;
+  }
+
+  .memory-inline-detail {
+    display: block;
+    margin-top: 10px;
+  }
+
+  .memory-detail {
+    position: static;
+  }
+
+  .memory-detail {
+    padding: 16px !important;
+  }
+
+  .memory-detail h2 {
+    font-size: 24px;
   }
 
   .daily-pack-learning-item .mantine-Group-root {

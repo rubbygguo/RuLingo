@@ -1,0 +1,15 @@
+{
+  "cloudbase": {
+    "username": "",
+    "password": "",
+    "owner": "",
+    "mysqlInstance": "default",
+    "mysqlDatabase": ""
+  },
+  "tables": {
+    "dailyPackSnapshots": "rulingo_daily_pack_snapshots",
+    "dailyPackResponses": "rulingo_daily_pack_responses",
+    "memoryItems": "rulingo_memory_items",
+    "memoryItemTags": "rulingo_memory_item_tags"
+  }
+}

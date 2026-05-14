@@ -1,0 +1,24 @@
+{
+  "type": "phrase",
+  "canonicalText": "take it for granted",
+  "displayText": "take it for granted",
+  "meaningZh": "认为某事理所当然",
+  "explanationEn": "To fail to appreciate something because it feels normal or expected.",
+  "examples": [
+    "We often take clean water for granted."
+  ],
+  "userContext": "Recorded from a Chat discussion about language memory design.",
+  "tags": [
+    {
+      "category": "topic",
+      "key": "daily-life",
+      "displayName": "日常生活"
+    },
+    {
+      "category": "usage",
+      "key": "attitude",
+      "displayName": "态度表达"
+    }
+  ],
+  "sourceKind": "chat"
+}

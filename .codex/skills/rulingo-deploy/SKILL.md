@@ -18,7 +18,7 @@ Use the repository-owned deployment command. Do not reimplement upload, CDN refr
 5. Use `npm run deploy:cos -- --prepare-only` only to validate build/packaging without uploading.
 6. Verify these milestones in the output:
    - `max build` completes successfully.
-   - `data/` is copied into `dist/data/`.
+   - The deploy script builds the Umi app into `dist/`.
    - `dist/` syncs to COS.
    - `dist/index.html` is reuploaded after sync.
    - CDN purge is submitted for route URLs.

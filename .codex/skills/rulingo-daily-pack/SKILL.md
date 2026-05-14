@@ -25,7 +25,7 @@ Work from the repository root.
 4. After authorization, generate the snapshot JSON at:
 
 ```text
-data/daily-packs/YYYY-MM-DD.json
+materials-system/daily-packs/YYYY-MM-DD/daily-pack-snapshot.json
 ```
 
 5. Validate that the JSON follows the DailyPack snapshot structure and source audit checklist defined in `materials-system/rules/每日素材包生成规则.md`. Structure validation alone is not enough.
@@ -34,7 +34,7 @@ data/daily-packs/YYYY-MM-DD.json
 8. Upload with:
 
 ```bash
-npm run daily-pack:upload -- --file=data/daily-packs/YYYY-MM-DD.json
+npm run daily-pack:upload -- --file=materials-system/daily-packs/YYYY-MM-DD/daily-pack-snapshot.json
 ```
 
 9. Treat every successful upload as an override of that day's current pack. Do not distinguish inserted vs updated in user-facing summaries.
@@ -43,35 +43,35 @@ npm run daily-pack:upload -- --file=data/daily-packs/YYYY-MM-DD.json
 
 ## CloudBase Upload Config Bootstrap
 
-The upload script uses `scripts/upload-daily-pack.mjs` and optional local config:
+The upload command uses the repository local ops CLI and optional local config:
 
 ```text
-scripts/cloudbase-daily-pack.local.json
+local-ops/rulingo.local.json
 ```
 
 This local config is ignored by git and may contain secrets. Never print raw secrets back to the user.
 
 Before upload:
 
-1. Check whether `scripts/cloudbase-daily-pack.local.json` exists.
-2. If missing, create it from `scripts/cloudbase-daily-pack.local.example.json`.
+1. Check whether `local-ops/rulingo.local.json` exists.
+2. If missing, create it from `local-ops/rulingo.local.example.json`.
 3. Read the local config and identify missing required values.
 4. Ask the user only for missing values.
 5. Preserve existing values when writing the config.
 6. Confirm secret fields as "configured", not by echoing their values.
 
-Upload reads CloudBase base configuration from the repository `.env` first:
+Upload reads CloudBase base configuration only from the repository `.env` or process environment:
 
 - `UMI_APP_CLOUDBASE_ENV_ID`
 - `UMI_APP_CLOUDBASE_REGION`
 - `UMI_APP_CLOUDBASE_ACCESS_KEY`
 
-Do not ask the user to duplicate these values in `scripts/cloudbase-daily-pack.local.json` when they already exist in `.env`.
+Do not put these values in `local-ops/rulingo.local.json`; that file is for local user identity and table overrides.
 
 Required in local config for upload:
 
 - `username` and `password` for the target RuLingo user. The `owner` field is CloudBase-managed, so the upload script must sign in as the target user and must not set `owner` manually.
-- `tableName`, default `rulingo_daily_pack_snapshots`.
+- `tables.dailyPackSnapshots`, default `rulingo_daily_pack_snapshots`.
 
 Required database table:
 
@@ -115,7 +115,7 @@ Regenerating the same day must replace the existing snapshot. Do not create dupl
 
 - Do not upload until the user has approved the proposed pack.
 - Do not use unverified external links, guessed URLs, or AI-invented source text as daily pack materials.
-- Do not commit `scripts/cloudbase-daily-pack.local.json`.
+- Do not commit `local-ops/rulingo.local.json` or legacy `scripts/cloudbase-daily-pack.local.json`.
 - Do not store user task answers or completion state in the snapshot JSON.
 - Do not fallback to local JSON in the app page when the database has no content; the page should show an empty state.
 - Do not hardcode CloudBase credentials, user ids, or production secrets into this skill or project code.

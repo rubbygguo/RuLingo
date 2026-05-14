@@ -15,7 +15,6 @@ export default defineConfig({
     { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" },
     { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png" }
   ],
-  plugins: ["./plugins/localDataServer.js"],
   routes: [
     {
       path: "/",
@@ -28,6 +27,10 @@ export default defineConfig({
     {
       path: "/daily-pack",
       component: "./daily-pack"
+    },
+    {
+      path: "/memory",
+      component: "./memory"
     },
     {
       path: "/login",

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Check RuLingo Daily Practice"
+  short_description: "Fetch and review saved RuLingo daily practice answers."
+  default_prompt: "帮我检查今天的 RuLingo 练习"

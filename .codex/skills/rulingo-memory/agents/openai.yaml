@@ -1,0 +1,4 @@
+interface:
+  display_name: "RuLingo Memory"
+  short_description: "Submit structured RuLingo language memory items from Chat."
+  default_prompt: "Add this language item to RuLingo memory."

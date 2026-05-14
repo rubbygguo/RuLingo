@@ -9,15 +9,13 @@ dist/
 src/.umi/
 src/.umi-production/
 
-# Vite cache (under node_modules but explicit if layout changes)
-.vite/
-
 # Environment & secrets
 .env
 .env.*
 !.env.example
 scripts/cos-deploy.local.json
 scripts/cloudbase-daily-pack.local.json
+local-ops/rulingo.local.json
 
 # Logs & debug
 *.log
@@ -45,4 +43,3 @@ coverage/
 
 # Locally generated learning material packs
 materials-system/daily-packs/
-data/daily-packs/

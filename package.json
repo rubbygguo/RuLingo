@@ -7,17 +7,18 @@
     "dev": "PORT=4173 max dev",
     "build": "max build",
     "deploy:cos": "node scripts/deploy-cos.mjs",
-    "daily-pack:upload": "node scripts/upload-daily-pack.mjs",
+    "local-ops": "node local-ops/src/cli.mjs",
+    "daily-pack:upload": "node local-ops/src/cli.mjs daily-pack upload",
+    "daily-practice:fetch": "node local-ops/src/cli.mjs daily-practice fetch",
+    "memory:upload": "node local-ops/src/cli.mjs memory upload",
     "preview": "PORT=4173 max preview"
   },
   "dependencies": {
-    "@cloudbase/js-sdk": "^2.28.5",
+    "@cloudbase/js-sdk": "^3.3.9",
     "@mantine/core": "^9.1.1",
     "@mantine/hooks": "^9.1.1",
     "@umijs/max": "^4.6.52",
-    "@vitejs/plugin-react": "^5.0.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "vite": "^7.0.0"
+    "react-dom": "^19.0.0"
   }
 }
