@@ -28,9 +28,9 @@ Work from the repository root.
 data/daily-packs/YYYY-MM-DD.json
 ```
 
-5. Validate that the JSON follows the DailyPack snapshot structure defined in `materials-system/rules/每日素材包生成规则.md`.
+5. Validate that the JSON follows the DailyPack snapshot structure and source audit checklist defined in `materials-system/rules/每日素材包生成规则.md`. Structure validation alone is not enough.
 6. Run `npm run build` after code changes. If only JSON changes and no code changed, build is optional but recommended before upload when practical.
-7. Before upload, run the "CloudBase Upload Preflight" checks below. Do not skip this when the upload will be run from Codex.
+7. Before upload, complete the source audit from the generation rules, then run the "CloudBase Upload Preflight" checks below. Do not skip either check when the upload will be run from Codex.
 8. Upload with:
 
 ```bash
@@ -39,7 +39,7 @@ npm run daily-pack:upload -- --file=data/daily-packs/YYYY-MM-DD.json
 
 9. Treat every successful upload as an override of that day's current pack. Do not distinguish inserted vs updated in user-facing summaries.
 10. If upload fails due to missing local config, follow "CloudBase Upload Config Bootstrap" and retry after the user provides the missing values.
-11. Summarize the generated date, theme, skill sections, override upload result, and any verification performed.
+11. Summarize the generated date, theme, real source materials, source audit result, skill sections, override upload result, and any verification performed.
 
 ## CloudBase Upload Config Bootstrap
 
@@ -114,6 +114,7 @@ Regenerating the same day must replace the existing snapshot. Do not create dupl
 ## Safety
 
 - Do not upload until the user has approved the proposed pack.
+- Do not use unverified external links, guessed URLs, or AI-invented source text as daily pack materials.
 - Do not commit `scripts/cloudbase-daily-pack.local.json`.
 - Do not store user task answers or completion state in the snapshot JSON.
 - Do not fallback to local JSON in the app page when the database has no content; the page should show an empty state.
